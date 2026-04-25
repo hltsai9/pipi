@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tech Quiz — LLMs &amp; GPUs</title>
-  <link rel="stylesheet" href="styles.css?v=2" />
+  <link rel="stylesheet" href="styles.css?v=3" />
   <link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='12' fill='%236366f1'/><text x='50%' y='58%' text-anchor='middle' font-family='Arial' font-size='32' font-weight='bold' fill='white'>Q</text></svg>" />
 </head>
 <body>
@@ -75,6 +75,38 @@
     <p class="muted">Quizzes on language models and graphics processing units.</p>
   </footer>
 
-  <script src="app.js?v=2"></script>
+  <!--
+    Engine and quiz data.
+    All <script> tags use defer, so they execute in document order
+    after the DOM is parsed but before DOMContentLoaded.
+
+    To add a new topic:
+      1. Create a file in quizzes/ that calls registerQuiz({...})
+         (see the comment block at the top of app.js for the schema).
+      2. Add a matching <script defer src="quizzes/your-file.js"></script>
+         line in the "Quiz data" block below. The order of these tags
+         determines the order of topic cards on the home screen.
+
+    To add a new collection (a new tab):
+      1. Add a registerCollection({key, title, description}) call in
+         quizzes/_collections.js.
+      2. Then add quiz files referencing that collection key.
+  -->
+  <script defer src="app.js?v=3"></script>
+
+  <!-- Quiz data -->
+  <script defer src="quizzes/_collections.js"></script>
+
+  <!-- LLMs -->
+  <script defer src="quizzes/llms-generic.js"></script>
+  <script defer src="quizzes/llms-instruction-tuned.js"></script>
+  <script defer src="quizzes/llms-dialogue-tuned.js"></script>
+  <script defer src="quizzes/llms-domain-specific.js"></script>
+  <script defer src="quizzes/llms-evolution.js"></script>
+
+  <!-- GPUs -->
+  <script defer src="quizzes/gpus-architecture.js"></script>
+  <script defer src="quizzes/gpus-cpu-vs-gpu.js"></script>
+  <script defer src="quizzes/gpus-evolution.js"></script>
 </body>
 </html>
