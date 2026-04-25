@@ -92,18 +92,28 @@ main {
 }
 
 /* Collection tabs */
-.collection-tabs {
+.collection-switcher {
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin: 24px 0 8px;
+}
+.collection-switcher-label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.collection-tabs {
+  display: inline-flex;
   gap: 6px;
   justify-content: center;
-  margin-top: 12px;
   padding: 6px;
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 999px;
-  width: fit-content;
-  margin-left: auto;
-  margin-right: auto;
 }
 .collection-tab {
   appearance: none;

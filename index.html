@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tech Quiz — LLMs &amp; GPUs</title>
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css?v=2" />
   <link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='12' fill='%236366f1'/><text x='50%' y='58%' text-anchor='middle' font-family='Arial' font-size='32' font-weight='bold' fill='white'>Q</text></svg>" />
 </head>
 <body>
@@ -21,7 +21,10 @@
   <main>
     <!-- HOME / TOPIC PICKER -->
     <section id="home" class="screen active">
-      <nav class="collection-tabs" id="collection-tabs" role="tablist"></nav>
+      <div class="collection-switcher">
+        <span class="collection-switcher-label">Collection</span>
+        <nav class="collection-tabs" id="collection-tabs" role="tablist"></nav>
+      </div>
       <div class="hero">
         <h2 id="collection-title">Choose a topic</h2>
         <p id="collection-desc" class="muted">Each quiz has multiple-choice questions with explanations after every answer.</p>
@@ -72,6 +75,6 @@
     <p class="muted">Quizzes on language models and graphics processing units.</p>
   </footer>
 
-  <script src="app.js"></script>
+  <script src="app.js?v=2"></script>
 </body>
 </html>
