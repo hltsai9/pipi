@@ -4,6 +4,8 @@ registerQuiz({
   title: "CPU vs. GPU",
   icon: "C",
   description: "Latency vs. throughput, control flow vs. data parallelism.",
+  createdAt: "2026-04-25T18:31:00Z",
+  updatedAt: "2026-04-25T18:31:00Z",
   questions: [
     {
       q: "Which one-line summary best captures the architectural difference between CPUs and GPUs?",

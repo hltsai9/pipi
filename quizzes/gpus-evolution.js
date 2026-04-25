@@ -4,6 +4,8 @@ registerQuiz({
   title: "Evolution of GPUs",
   icon: "E",
   description: "From fixed-function graphics pipelines to programmable AI accelerators.",
+  createdAt: "2026-04-25T18:32:00Z",
+  updatedAt: "2026-04-25T18:32:00Z",
   questions: [
     {
       q: "What were early GPUs (late 1990s, e.g., NVIDIA RIVA / GeForce 256) primarily designed to do?",

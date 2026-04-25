@@ -16,6 +16,8 @@
  *         title: "Prompt Engineering",
  *         icon: "P",                     // single letter / emoji shown on card
  *         description: "Patterns and pitfalls in prompting LLMs.",
+ *         createdAt: "2026-04-25T18:00:00Z",   // ISO 8601 string
+ *         updatedAt: "2026-04-25T18:00:00Z",   // ISO 8601 string
  *         questions: [
  *           {
  *             q: "Which prompting technique...?",
@@ -65,12 +67,24 @@ const Quiz = (() => {
     if (description !== undefined) c.description = description;
   }
 
-  function registerQuiz({ collection, key, title, icon, description, questions }) {
+  function parseTimestamp(value, fieldName, refLabel) {
+    if (value === undefined || value === null || value === "") return 0;
+    const ms = (typeof value === "number") ? value : new Date(value).getTime();
+    if (Number.isNaN(ms)) {
+      throw new Error(`registerQuiz: '${refLabel}' has invalid ${fieldName}: ${value}`);
+    }
+    return ms;
+  }
+
+  function registerQuiz({ collection, key, title, icon, description, questions, createdAt, updatedAt }) {
     if (!collection) throw new Error("registerQuiz: 'collection' is required");
     if (!key) throw new Error("registerQuiz: 'key' is required");
     if (!Array.isArray(questions) || questions.length === 0) {
       throw new Error(`registerQuiz: '${collection}/${key}' has no questions`);
     }
+    const ref = `${collection}/${key}`;
+    const created = parseTimestamp(createdAt, "createdAt", ref);
+    const updated = parseTimestamp(updatedAt, "updatedAt", ref) || created;
     const c = ensureCollection(collection);
     if (!c.topics[key]) c.topicOrder.push(key);
     c.topics[key] = {
@@ -78,7 +92,9 @@ const Quiz = (() => {
       title: title || key,
       icon: icon || "?",
       description: description || "",
-      questions
+      questions,
+      createdAt: created,
+      updatedAt: updated
     };
   }
 
@@ -98,10 +114,37 @@ const state = {
   currentTopic: null,
   currentIndex: 0,
   score: 0,
-  answered: false
+  answered: false,
+  sortBy: "created",   // "created" | "updated"
+  sortDir: "desc"      // "asc" | "desc"
 };
 
+const SORT_OPTIONS = [
+  { value: "created-desc", sortBy: "created", sortDir: "desc", label: "Created (newest first)" },
+  { value: "created-asc",  sortBy: "created", sortDir: "asc",  label: "Created (oldest first)" },
+  { value: "updated-desc", sortBy: "updated", sortDir: "desc", label: "Updated (newest first)" },
+  { value: "updated-asc",  sortBy: "updated", sortDir: "asc",  label: "Updated (oldest first)" }
+];
+
 const $ = (id) => document.getElementById(id);
+
+function formatDate(ms) {
+  if (!ms) return "—";
+  return new Date(ms).toLocaleDateString(undefined, {
+    year: "numeric", month: "short", day: "numeric"
+  });
+}
+
+function sortKey(topic) {
+  return state.sortBy === "updated" ? topic.updatedAt : topic.createdAt;
+}
+
+function sortedTopicKeys(collection) {
+  const dir = state.sortDir === "desc" ? -1 : 1;
+  return collection.topicOrder.slice().sort((a, b) => {
+    return dir * (sortKey(collection.topics[a]) - sortKey(collection.topics[b]));
+  });
+}
 
 function getCurrentCollection() {
   return Quiz.getCollections()[state.currentCollection];
@@ -138,7 +181,29 @@ function renderCollectionTabs() {
   if (c) $("collection-desc").textContent = c.description || "";
 }
 
+function renderSortControl() {
+  const select = $("sort-select");
+  if (!select) return;
+  if (!select.options.length) {
+    for (const opt of SORT_OPTIONS) {
+      const o = document.createElement("option");
+      o.value = opt.value;
+      o.textContent = opt.label;
+      select.appendChild(o);
+    }
+    select.addEventListener("change", () => {
+      const opt = SORT_OPTIONS.find((o) => o.value === select.value);
+      if (!opt) return;
+      state.sortBy = opt.sortBy;
+      state.sortDir = opt.sortDir;
+      renderTopics();
+    });
+  }
+  select.value = `${state.sortBy}-${state.sortDir}`;
+}
+
 function renderTopics() {
+  renderSortControl();
   const collection = getCurrentCollection();
   const grid = $("topic-grid");
   grid.innerHTML = "";
@@ -146,16 +211,26 @@ function renderTopics() {
     grid.innerHTML = `<p class="muted">No quizzes registered yet.</p>`;
     return;
   }
-  for (const key of collection.topicOrder) {
+  for (const key of sortedTopicKeys(collection)) {
     const quiz = collection.topics[key];
     const card = document.createElement("button");
     card.className = "topic-card";
     card.innerHTML = `
-      <span class="topic-icon">${quiz.icon}</span>
-      <h3>${quiz.title}</h3>
-      <p>${quiz.description}</p>
-      <span class="topic-count">${quiz.questions.length} questions</span>
+      <span class="topic-icon"></span>
+      <h3></h3>
+      <p></p>
+      <span class="topic-count"></span>
+      <div class="topic-meta">
+        <span><span class="topic-meta-label">Created</span> <span class="topic-meta-date" data-field="created"></span></span>
+        <span><span class="topic-meta-label">Updated</span> <span class="topic-meta-date" data-field="updated"></span></span>
+      </div>
     `;
+    card.querySelector(".topic-icon").textContent = quiz.icon;
+    card.querySelector("h3").textContent = quiz.title;
+    card.querySelector("p").textContent = quiz.description;
+    card.querySelector(".topic-count").textContent = `${quiz.questions.length} questions`;
+    card.querySelector('[data-field="created"]').textContent = formatDate(quiz.createdAt);
+    card.querySelector('[data-field="updated"]').textContent = formatDate(quiz.updatedAt);
     card.addEventListener("click", () => startQuiz(key));
     grid.appendChild(card);
   }

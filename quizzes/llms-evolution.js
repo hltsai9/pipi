@@ -4,6 +4,8 @@ registerQuiz({
   title: "Evolution of LLMs",
   icon: "E",
   description: "From n-grams and word embeddings to transformers and modern frontier models.",
+  createdAt: "2026-04-25T18:04:00Z",
+  updatedAt: "2026-04-25T18:04:00Z",
   questions: [
     {
       q: "Which 2017 paper introduced the architecture that underpins essentially all modern large language models?",

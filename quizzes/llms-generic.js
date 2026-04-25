@@ -4,6 +4,8 @@ registerQuiz({
   title: "Generic Language Models",
   icon: "G",
   description: "Foundation models trained on broad text to predict the next token.",
+  createdAt: "2026-04-25T18:00:00Z",
+  updatedAt: "2026-04-25T18:00:00Z",
   questions: [
     {
       q: "What is the core training objective of a generic (pretrained) large language model?",

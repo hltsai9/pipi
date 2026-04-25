@@ -4,6 +4,8 @@ registerQuiz({
   title: "Instruction-Tuned LLMs",
   icon: "I",
   description: "Models fine-tuned to follow natural-language instructions.",
+  createdAt: "2026-04-25T18:01:00Z",
+  updatedAt: "2026-04-25T18:01:00Z",
   questions: [
     {
       q: "What is the main goal of instruction tuning?",

@@ -4,6 +4,8 @@ registerQuiz({
   title: "Domain-Specific LLMs",
   icon: "S",
   description: "Models specialized for medicine, law, code, finance, and more.",
+  createdAt: "2026-04-25T18:03:00Z",
+  updatedAt: "2026-04-25T18:03:00Z",
   questions: [
     {
       q: "Which of these is an example of a domain-specific LLM?",

@@ -4,6 +4,8 @@ registerQuiz({
   title: "Dialogue-Tuned LLMs",
   icon: "D",
   description: "Models specialized for multi-turn conversation and chat.",
+  createdAt: "2026-04-25T18:02:00Z",
+  updatedAt: "2026-04-25T18:02:00Z",
   questions: [
     {
       q: "What primarily distinguishes a dialogue-tuned LLM from an instruction-tuned LLM?",

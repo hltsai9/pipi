@@ -4,6 +4,8 @@ registerQuiz({
   title: "GPU Architecture",
   icon: "A",
   description: "Cores, warps, memory hierarchy, and the SIMT execution model.",
+  createdAt: "2026-04-25T18:30:00Z",
+  updatedAt: "2026-04-25T18:30:00Z",
   questions: [
     {
       q: "Which execution model best describes how modern NVIDIA GPUs run code?",
