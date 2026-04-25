@@ -3,182 +3,73 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pikmin Command — Squad Management</title>
+  <title>LLM Quiz — Test Your Knowledge of Language Models</title>
   <link rel="stylesheet" href="styles.css" />
-  <link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><circle cx='32' cy='38' r='18' fill='%23e74c3c'/><rect x='30' y='4' width='4' height='18' fill='%23355e2c'/><circle cx='32' cy='6' r='5' fill='%23f7d14a'/></svg>" />
+  <link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='12' fill='%236366f1'/><text x='50%' y='58%' text-anchor='middle' font-family='Arial' font-size='32' font-weight='bold' fill='white'>Q</text></svg>" />
 </head>
 <body>
   <header class="topbar">
     <div class="brand">
-      <span class="leaf"></span>
-      <h1>Pikmin Command</h1>
-    </div>
-    <nav class="tabs" role="tablist">
-      <button class="tab active" data-tab="roster" role="tab">Roster</button>
-      <button class="tab" data-tab="tasks" role="tab">Tasks</button>
-      <button class="tab" data-tab="dashboard" role="tab">Dashboard</button>
-      <button class="tab" data-tab="onion" role="tab">Onion</button>
-    </nav>
-    <div class="captain">
-      <label for="captain-name">Captain</label>
-      <input id="captain-name" type="text" placeholder="Olimar" maxlength="24" />
+      <span class="logo">Q</span>
+      <div>
+        <h1>LLM Quiz</h1>
+        <p class="tag">Test your knowledge of large language models</p>
+      </div>
     </div>
   </header>
 
   <main>
-    <!-- ROSTER TAB -->
-    <section id="roster" class="tab-panel active">
-      <div class="panel-header">
-        <h2>Squad Roster</h2>
-        <div class="controls">
-          <input type="search" id="search" placeholder="Search by name or note…" />
-          <select id="filter-type">
-            <option value="">All types</option>
-          </select>
-          <select id="filter-stage">
-            <option value="">All stages</option>
-            <option value="Leaf">Leaf</option>
-            <option value="Bud">Bud</option>
-            <option value="Flower">Flower</option>
-          </select>
-          <select id="sort-by">
-            <option value="created">Newest</option>
-            <option value="name">Name (A→Z)</option>
-            <option value="type">Type</option>
-            <option value="level">Level (high→low)</option>
-            <option value="stage">Stage (flower→leaf)</option>
-          </select>
-          <button id="add-pikmin" class="btn primary">+ Recruit Pikmin</button>
-        </div>
+    <!-- HOME / TOPIC PICKER -->
+    <section id="home" class="screen active">
+      <div class="hero">
+        <h2>Choose a topic</h2>
+        <p class="muted">Each quiz has multiple-choice questions with explanations after every answer.</p>
       </div>
-      <div id="roster-grid" class="grid"></div>
-      <p id="empty-roster" class="empty hidden">No Pikmin yet. Pluck some from the Onion to get started!</p>
+      <div id="topic-grid" class="topic-grid"></div>
     </section>
 
-    <!-- TASKS TAB -->
-    <section id="tasks" class="tab-panel">
-      <div class="panel-header">
-        <h2>Field Tasks</h2>
-        <button id="add-task" class="btn primary">+ New Task</button>
+    <!-- QUIZ -->
+    <section id="quiz" class="screen">
+      <div class="quiz-header">
+        <button id="back-home" class="btn ghost">&larr; Topics</button>
+        <div class="quiz-meta">
+          <span id="quiz-title" class="quiz-title"></span>
+          <span id="progress-text" class="progress-text"></span>
+        </div>
+        <div class="score-pill">Score: <span id="score">0</span></div>
       </div>
-      <div class="task-columns">
-        <div class="task-col" data-status="todo">
-          <h3>To Do</h3>
-          <ul class="task-list" data-status="todo"></ul>
+      <div class="progress-bar"><div id="progress-fill"></div></div>
+
+      <article class="question-card">
+        <h3 id="question-text"></h3>
+        <ul id="choices" class="choices"></ul>
+        <div id="explanation" class="explanation hidden">
+          <h4 id="explanation-title"></h4>
+          <p id="explanation-text"></p>
         </div>
-        <div class="task-col" data-status="active">
-          <h3>In Progress</h3>
-          <ul class="task-list" data-status="active"></ul>
+        <div class="quiz-actions">
+          <button id="next-btn" class="btn primary hidden">Next Question &rarr;</button>
         </div>
-        <div class="task-col" data-status="done">
-          <h3>Completed</h3>
-          <ul class="task-list" data-status="done"></ul>
-        </div>
-      </div>
+      </article>
     </section>
 
-    <!-- DASHBOARD TAB -->
-    <section id="dashboard" class="tab-panel">
-      <div class="panel-header"><h2>Dashboard</h2></div>
-      <div class="stats">
-        <div class="stat-card"><span class="stat-num" id="stat-total">0</span><span class="stat-label">Total Pikmin</span></div>
-        <div class="stat-card"><span class="stat-num" id="stat-flower">0</span><span class="stat-label">Flowered</span></div>
-        <div class="stat-card"><span class="stat-num" id="stat-tasks">0</span><span class="stat-label">Active Tasks</span></div>
-        <div class="stat-card"><span class="stat-num" id="stat-done">0</span><span class="stat-label">Tasks Completed</span></div>
-      </div>
-      <div class="dashboard-grid">
-        <div class="card">
-          <h3>Squad Composition</h3>
-          <div id="type-bars" class="type-bars"></div>
+    <!-- RESULTS -->
+    <section id="results" class="screen">
+      <div class="results-card">
+        <h2>Quiz Complete!</h2>
+        <p class="result-line">You scored <span id="final-score">0</span> out of <span id="final-total">0</span></p>
+        <p id="result-message" class="muted"></p>
+        <div class="results-actions">
+          <button id="retry-btn" class="btn primary">Try Again</button>
+          <button id="home-btn" class="btn ghost">Pick Another Topic</button>
         </div>
-        <div class="card">
-          <h3>Stage Breakdown</h3>
-          <div id="stage-breakdown" class="stage-breakdown"></div>
-        </div>
-        <div class="card">
-          <h3>Top Performers</h3>
-          <ol id="top-performers" class="top-list"></ol>
-        </div>
-        <div class="card">
-          <h3>Squad Tips</h3>
-          <ul id="tips" class="tips"></ul>
-        </div>
-      </div>
-    </section>
-
-    <!-- ONION TAB -->
-    <section id="onion" class="tab-panel">
-      <div class="panel-header"><h2>The Onion</h2></div>
-      <p class="muted">Pluck Pikmin from the Onion to grow your squad. Every type has its own strengths.</p>
-      <div id="onion-grid" class="onion-grid"></div>
-      <div class="card danger-zone">
-        <h3>Danger Zone</h3>
-        <p>Reset all data. This cannot be undone.</p>
-        <button id="reset-all" class="btn danger">Reset everything</button>
       </div>
     </section>
   </main>
 
-  <!-- Pikmin modal -->
-  <div id="pikmin-modal" class="modal hidden" role="dialog" aria-modal="true">
-    <div class="modal-card">
-      <h3 id="pikmin-modal-title">Recruit Pikmin</h3>
-      <form id="pikmin-form">
-        <label>Name<input type="text" name="name" required maxlength="32" /></label>
-        <label>Type
-          <select name="type" id="pikmin-type-select"></select>
-        </label>
-        <label>Stage
-          <select name="stage">
-            <option value="Leaf">Leaf</option>
-            <option value="Bud">Bud</option>
-            <option value="Flower">Flower</option>
-          </select>
-        </label>
-        <label>Level (1–10)
-          <input type="number" name="level" min="1" max="10" value="1" />
-        </label>
-        <label>Notes
-          <textarea name="notes" rows="3" maxlength="240" placeholder="Favorite snack, quirks…"></textarea>
-        </label>
-        <div class="modal-actions">
-          <button type="button" class="btn ghost" data-close>Cancel</button>
-          <button type="submit" class="btn primary">Save</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Task modal -->
-  <div id="task-modal" class="modal hidden" role="dialog" aria-modal="true">
-    <div class="modal-card">
-      <h3 id="task-modal-title">New Task</h3>
-      <form id="task-form">
-        <label>Title<input type="text" name="title" required maxlength="64" /></label>
-        <label>Description<textarea name="description" rows="2" maxlength="240"></textarea></label>
-        <label>Required Type
-          <select name="requiredType"><option value="">Any</option></select>
-        </label>
-        <label>Assigned Pikmin
-          <select name="assigned" multiple size="6"></select>
-          <small class="muted">Hold Ctrl/Cmd to select multiple.</small>
-        </label>
-        <label>Status
-          <select name="status">
-            <option value="todo">To Do</option>
-            <option value="active">In Progress</option>
-            <option value="done">Completed</option>
-          </select>
-        </label>
-        <div class="modal-actions">
-          <button type="button" class="btn ghost" data-close>Cancel</button>
-          <button type="submit" class="btn primary">Save</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <div id="toast" class="toast hidden"></div>
+  <footer class="footer">
+    <p class="muted">Built for learning about generic, instruction-tuned, dialogue-tuned, and domain-specific LLMs.</p>
+  </footer>
 
   <script src="app.js"></script>
 </body>
