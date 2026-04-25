@@ -1,7 +1,7 @@
-/* LLM Quiz — multiple-choice quizzes with explanations.
+/* Tech Quiz — multiple-choice quizzes with explanations.
  * Pure client-side, no dependencies. */
 
-const QUIZZES = {
+const LLM_QUIZZES = {
   generic: {
     title: "Generic Language Models",
     icon: "G",
@@ -340,14 +340,298 @@ const QUIZZES = {
   }
 };
 
-const TOPIC_ORDER = ["generic", "instruction", "dialogue", "domain", "evolution"];
+const GPU_QUIZZES = {
+  architecture: {
+    title: "GPU Architecture",
+    icon: "A",
+    description: "Cores, warps, memory hierarchy, and the SIMT execution model.",
+    questions: [
+      {
+        q: "Which execution model best describes how modern NVIDIA GPUs run code?",
+        choices: [
+          "MIMD — every core fetches a different instruction per cycle",
+          "SIMT — groups of threads execute the same instruction together in lock-step",
+          "Pure scalar execution, one instruction per thread per cycle, fully independent",
+          "Dataflow — instructions fire when their inputs are ready"
+        ],
+        answer: 1,
+        explanation: "NVIDIA calls its model SIMT (Single Instruction, Multiple Threads). Threads are grouped into warps of 32 that share an instruction pointer; if threads in a warp take different branches, the warp serializes them (warp divergence). It's a generalization of classic SIMD."
+      },
+      {
+        q: "On NVIDIA GPUs, how many threads make up a single warp?",
+        choices: ["8", "16", "32", "64"],
+        answer: 2,
+        explanation: "An NVIDIA warp is 32 threads. AMD's analogous unit is the wavefront — historically 64 threads on GCN, and 32 on RDNA. Warp/wavefront size matters because divergent branches inside one warp serialize and waste lanes."
+      },
+      {
+        q: "Which is the typical memory hierarchy ordering on a GPU, from fastest to slowest?",
+        choices: [
+          "Global memory → L2 cache → shared memory → registers",
+          "Registers → shared memory / L1 → L2 cache → global (HBM/GDDR) memory",
+          "HBM → registers → shared memory → L2",
+          "L2 → registers → L1 → shared memory"
+        ],
+        answer: 1,
+        explanation: "From fastest/smallest to slowest/largest: per-thread registers, then per-block shared memory / L1 (on-chip SRAM), then a shared L2 cache, then off-chip global memory (GDDR or HBM). Good GPU code keeps hot data in registers and shared memory."
+      },
+      {
+        q: "What is a Streaming Multiprocessor (SM) on an NVIDIA GPU?",
+        choices: [
+          "The PCIe interconnect block",
+          "A scheduler block containing many CUDA cores, warp schedulers, registers, and shared memory",
+          "The video output engine",
+          "An on-chip cache only"
+        ],
+        answer: 1,
+        explanation: "An SM is the GPU's basic compute building block. It bundles execution units (CUDA cores, tensor cores, special-function units), warp schedulers, a register file, and shared memory / L1. A modern GPU has dozens to over a hundred SMs working in parallel."
+      },
+      {
+        q: "What are Tensor Cores designed to accelerate?",
+        choices: [
+          "General double-precision scalar arithmetic",
+          "Ray-triangle intersection tests",
+          "Small matrix-multiply-and-accumulate operations, often in lower precision (FP16/BF16/FP8/INT8)",
+          "Memory copies between host and device"
+        ],
+        answer: 2,
+        explanation: "Tensor Cores (introduced in Volta, 2017) execute small matrix-multiply-accumulate (MMA) operations as one instruction, primarily in reduced precision. They are the workhorses behind modern deep-learning throughput, often offering 5–20× the FLOPs of regular CUDA cores for matmul."
+      },
+      {
+        q: "What is 'warp divergence' and why does it hurt performance?",
+        choices: [
+          "When two GPUs in NVLink fall out of sync — fixed by NVLink topology tools",
+          "When threads in the same warp take different branches and the warp must serialize each branch path, idling other lanes",
+          "When the GPU clock drifts from the CPU clock, causing missed frames",
+          "When PCIe DMA transfers are reordered"
+        ],
+        answer: 1,
+        explanation: "Because a warp shares one program counter, if its 32 threads take different branches the hardware executes each path with the non-participating lanes masked off. The cost scales with the number of distinct paths, so data-dependent branching inside a warp is a classic GPU performance pitfall."
+      },
+      {
+        q: "Why does GPU memory bandwidth (e.g., HBM3) matter so much for deep-learning workloads?",
+        choices: [
+          "Because deep learning runs entirely from disk",
+          "Many DL kernels are memory-bandwidth bound — feeding tensor cores fast enough requires very high off-chip bandwidth",
+          "Because GPUs cannot cache anything",
+          "Because PCIe bandwidth is unlimited so HBM is irrelevant"
+        ],
+        answer: 1,
+        explanation: "Modern accelerators have so much compute that many real workloads are limited by how fast data can be moved into the chip — not by FLOPs. HBM (High-Bandwidth Memory) stacks DRAM dies next to the GPU die over a wide interface, delivering TB/s of bandwidth that GDDR can't match."
+      }
+    ]
+  },
+
+  cpu_vs_gpu: {
+    title: "CPU vs. GPU",
+    icon: "C",
+    description: "Latency vs. throughput, control flow vs. data parallelism.",
+    questions: [
+      {
+        q: "Which one-line summary best captures the architectural difference between CPUs and GPUs?",
+        choices: [
+          "CPUs are analog; GPUs are digital",
+          "CPUs are latency-optimized with few powerful cores; GPUs are throughput-optimized with many simpler cores",
+          "GPUs run only graphics; CPUs run only general code",
+          "CPUs are 64-bit; GPUs are 32-bit"
+        ],
+        answer: 1,
+        explanation: "A CPU dedicates lots of transistors to making a single thread fast: deep pipelines, big caches, branch prediction, out-of-order execution. A GPU dedicates transistors to running thousands of simpler threads in parallel — sacrificing single-thread latency for aggregate throughput."
+      },
+      {
+        q: "Which feature is far more developed on a CPU than on a GPU?",
+        choices: [
+          "High aggregate floating-point throughput",
+          "Sophisticated per-core branch prediction and out-of-order execution",
+          "Wide SIMD-style execution across thousands of lanes",
+          "On-chip HBM memory"
+        ],
+        answer: 1,
+        explanation: "CPUs put enormous die area into making sequential code fast: branch predictors, large reorder buffers, speculative execution, deep cache hierarchies. GPUs largely skip this complexity per core and instead hide latency by switching to other ready warps."
+      },
+      {
+        q: "Which workload is best suited to a GPU?",
+        choices: [
+          "A small recursive parser with heavy data-dependent branching",
+          "A 16-core build of a C++ project",
+          "Multiplying two 8192×8192 matrices with millions of independent multiply-adds",
+          "Booting an operating system"
+        ],
+        answer: 2,
+        explanation: "GPUs shine on workloads that are massively data-parallel, regular, and arithmetic-heavy — exactly like dense linear algebra, image filters, and physics simulations. Code with heavy serial dependencies or unpredictable branches stays on the CPU."
+      },
+      {
+        q: "How do CPUs and GPUs differ in how they hide memory latency?",
+        choices: [
+          "CPUs ignore memory latency entirely",
+          "CPUs rely on big caches, prefetchers, and out-of-order execution; GPUs rely on massive thread-level parallelism, swapping in other ready warps when one stalls",
+          "GPUs use no caches, only registers",
+          "Both rely solely on prefetchers"
+        ],
+        answer: 1,
+        explanation: "The CPU strategy is to keep one thread fast: deep caches, prefetching, OOO. The GPU strategy is the opposite: when a warp stalls on memory, the SM instantly switches to another ready warp. With thousands of in-flight threads, latency is amortized across them."
+      },
+      {
+        q: "Which statement about cache sizes is most accurate?",
+        choices: [
+          "GPUs typically have larger per-core caches than CPUs",
+          "CPUs have much larger per-core caches; GPU caches are smaller per thread but feed thousands of threads",
+          "Neither CPUs nor GPUs use caches",
+          "GPU L2 caches are always bigger than CPU L3 caches"
+        ],
+        answer: 1,
+        explanation: "Server CPUs often have tens of MB of L3 per core's reach. GPUs have proportionally less cache per thread because they are not trying to keep one thread fast — they're keeping thousands of threads fed, mostly via high-bandwidth memory and software-managed shared memory."
+      },
+      {
+        q: "Why are GPUs so dominant for deep-learning training?",
+        choices: [
+          "Because neural networks require an OS",
+          "Because matmul-heavy workloads map naturally to thousands of parallel multiply-accumulate units, and tensor cores accelerate the dominant kernels further",
+          "Because CPUs cannot do floating-point math",
+          "Because GPUs have higher clock speeds than CPUs"
+        ],
+        answer: 1,
+        explanation: "Training is dominated by large dense matrix multiplications and convolutions — embarrassingly data-parallel and arithmetic-intensive. GPUs offer one to two orders of magnitude more relevant FLOPs and bandwidth than CPUs, and tensor cores extend that lead in low precision."
+      },
+      {
+        q: "Which is a typical reason to keep a workload on the CPU rather than offload to a GPU?",
+        choices: [
+          "The workload is small or highly serial, and PCIe transfer overhead would dominate any speedup",
+          "GPUs cannot do integer arithmetic",
+          "GPUs cannot run code written in C",
+          "CPUs are always faster"
+        ],
+        answer: 0,
+        explanation: "Moving data over PCIe and launching a kernel has measurable overhead. For small, latency-sensitive, or serial tasks the round trip eats any compute advantage. Heuristic: GPUs win when the data is big and the work per byte is high."
+      }
+    ]
+  },
+
+  evolution: {
+    title: "Evolution of GPUs",
+    icon: "E",
+    description: "From fixed-function graphics pipelines to programmable AI accelerators.",
+    questions: [
+      {
+        q: "What were early GPUs (late 1990s, e.g., NVIDIA RIVA / GeForce 256) primarily designed to do?",
+        choices: [
+          "Train neural networks",
+          "Accelerate fixed-function 3D graphics pipelines — transform, lighting, and rasterization",
+          "Mine cryptocurrency",
+          "Run general-purpose C code"
+        ],
+        answer: 1,
+        explanation: "The original GPUs offloaded the fixed-function 3D graphics pipeline — vertex transform & lighting (T&L), rasterization, texture mapping — from the CPU. NVIDIA marketed the GeForce 256 (1999) as 'the world's first GPU' because it integrated T&L on the chip."
+      },
+      {
+        q: "What major shift did programmable shaders (early 2000s, e.g., GeForce 3, DirectX 8) introduce?",
+        choices: [
+          "GPUs gained their own operating system",
+          "Parts of the pipeline (vertex and pixel processing) became programmable, enabling custom per-vertex/per-pixel code",
+          "GPUs stopped supporting 3D graphics",
+          "GPUs moved off the PCIe bus"
+        ],
+        answer: 1,
+        explanation: "Programmable vertex and pixel shaders replaced fixed-function stages with small programs. This is the foundation everything else built on — once you can run arbitrary code per-pixel, the GPU is on its way to becoming a general parallel processor."
+      },
+      {
+        q: "Which 2006 release made GPUs broadly usable for general-purpose computation?",
+        choices: [
+          "AMD's Radeon HD 2900",
+          "NVIDIA's G80 / GeForce 8800 with the launch of CUDA",
+          "Intel's Larrabee",
+          "Apple's Metal API"
+        ],
+        answer: 1,
+        explanation: "NVIDIA's G80 (2006) introduced a unified shader architecture and shipped alongside CUDA, a C-like programming model for general computation on the GPU. It turned GPUs from graphics-only chips into general parallel processors and kicked off the GPGPU era."
+      },
+      {
+        q: "Which moment is widely credited with sparking the modern deep-learning boom on GPUs?",
+        choices: [
+          "Quake III being released in 1999",
+          "AlexNet winning ImageNet 2012, trained on two NVIDIA GTX 580 GPUs",
+          "The launch of OpenGL 1.0",
+          "The release of Windows Vista"
+        ],
+        answer: 1,
+        explanation: "Krizhevsky, Sutskever, and Hinton's AlexNet (2012) cut ImageNet error dramatically and was trained on consumer GPUs. It demonstrated that GPU-accelerated deep learning was practical and effective, triggering the modern surge in DL research and GPU demand."
+      },
+      {
+        q: "Which NVIDIA architecture introduced Tensor Cores for accelerating mixed-precision matrix math?",
+        choices: ["Kepler (2012)", "Maxwell (2014)", "Pascal (2016)", "Volta (2017)"],
+        answer: 3,
+        explanation: "Volta (V100, 2017) was the first NVIDIA architecture with Tensor Cores. They've been a centerpiece of every datacenter generation since: Turing, Ampere (A100), Hopper (H100, with FP8), and Blackwell (B100/B200)."
+      },
+      {
+        q: "Which architecture introduced dedicated RT (ray-tracing) cores for real-time ray-triangle intersection?",
+        choices: ["Pascal", "Volta", "Turing (2018)", "Ampere"],
+        answer: 2,
+        explanation: "Turing (RTX 20-series, 2018) added RT cores for hardware-accelerated BVH traversal and ray-triangle tests, enabling real-time ray tracing in games. Turing also brought tensor cores to consumer GPUs, powering DLSS."
+      },
+      {
+        q: "What does HBM (High-Bandwidth Memory) provide that GDDR does not, and why does it matter for AI GPUs?",
+        choices: [
+          "HBM is cheaper per GB than GDDR",
+          "HBM stacks DRAM dies and uses a very wide interface for far higher bandwidth, which is critical for memory-bound DL workloads",
+          "HBM stores data on disk for persistence",
+          "HBM is non-volatile"
+        ],
+        answer: 1,
+        explanation: "HBM places stacked DRAM next to the GPU on a silicon interposer, with a much wider interface than GDDR. The result is dramatically higher bandwidth (TB/s), at higher cost. Datacenter AI GPUs (P100/V100/A100/H100/B200, MI200/MI300) all use HBM because DL is bandwidth-hungry."
+      },
+      {
+        q: "Roughly, what is the chronological order of these recent NVIDIA datacenter architectures?",
+        choices: [
+          "Hopper → Ampere → Volta → Blackwell",
+          "Volta (2017) → Ampere (2020) → Hopper (2022) → Blackwell (2024)",
+          "Ampere → Volta → Blackwell → Hopper",
+          "Blackwell → Hopper → Volta → Ampere"
+        ],
+        answer: 1,
+        explanation: "The datacenter line ran Volta (V100) → Turing (T4) → Ampere (A100) → Hopper (H100, with FP8 and the Transformer Engine) → Blackwell (B100/B200, ~2024). Each generation pushed tensor throughput, memory bandwidth, and interconnect (NVLink/NVSwitch) for ever-larger models."
+      },
+      {
+        q: "Which trend has most defined GPU evolution since ~2017?",
+        choices: [
+          "A return to fixed-function graphics-only pipelines",
+          "Specialization for AI: tensor cores, lower-precision formats (FP16/BF16/FP8), HBM, fast interconnects, and multi-GPU scale-out",
+          "Dropping floating-point support",
+          "Moving entirely off PCIe to USB"
+        ],
+        answer: 1,
+        explanation: "Modern GPU roadmaps are increasingly shaped by AI workloads: tensor/matrix engines, ever-lower precision (FP16 → BF16 → FP8 → FP4), HBM stacks for bandwidth, NVLink/NVSwitch for tight multi-GPU coupling, and rack-scale systems (DGX/HGX, GB200 NVL72) optimized for training and serving large models."
+      }
+    ]
+  }
+};
+
+const COLLECTIONS = {
+  llms: {
+    title: "LLMs",
+    description: "Each quiz has multiple-choice questions with explanations after every answer.",
+    quizzes: LLM_QUIZZES,
+    topicOrder: ["generic", "instruction", "dialogue", "domain", "evolution"]
+  },
+  gpus: {
+    title: "GPUs",
+    description: "Architecture, how GPUs differ from CPUs, and how they evolved into AI accelerators.",
+    quizzes: GPU_QUIZZES,
+    topicOrder: ["architecture", "cpu_vs_gpu", "evolution"]
+  }
+};
+
+const COLLECTION_ORDER = ["llms", "gpus"];
 
 const state = {
+  currentCollection: "llms",
   currentTopic: null,
   currentIndex: 0,
   score: 0,
   answered: false
 };
+
+function getQuiz(topicKey) {
+  return COLLECTIONS[state.currentCollection].quizzes[topicKey];
+}
 
 const $ = (id) => document.getElementById(id);
 
@@ -356,11 +640,33 @@ function showScreen(name) {
   $(name).classList.add("active");
 }
 
+function renderCollectionTabs() {
+  const tabs = $("collection-tabs");
+  tabs.innerHTML = "";
+  for (const key of COLLECTION_ORDER) {
+    const c = COLLECTIONS[key];
+    const btn = document.createElement("button");
+    btn.className = "collection-tab" + (key === state.currentCollection ? " active" : "");
+    btn.textContent = c.title;
+    btn.setAttribute("role", "tab");
+    btn.addEventListener("click", () => {
+      if (state.currentCollection === key) return;
+      state.currentCollection = key;
+      renderCollectionTabs();
+      renderTopics();
+    });
+    tabs.appendChild(btn);
+  }
+  const c = COLLECTIONS[state.currentCollection];
+  $("collection-desc").textContent = c.description;
+}
+
 function renderTopics() {
+  const collection = COLLECTIONS[state.currentCollection];
   const grid = $("topic-grid");
   grid.innerHTML = "";
-  for (const key of TOPIC_ORDER) {
-    const quiz = QUIZZES[key];
+  for (const key of collection.topicOrder) {
+    const quiz = collection.quizzes[key];
     const card = document.createElement("button");
     card.className = "topic-card";
     card.innerHTML = `
@@ -379,14 +685,14 @@ function startQuiz(topicKey) {
   state.currentIndex = 0;
   state.score = 0;
   state.answered = false;
-  $("quiz-title").textContent = QUIZZES[topicKey].title;
+  $("quiz-title").textContent = getQuiz(topicKey).title;
   $("score").textContent = "0";
   showScreen("quiz");
   renderQuestion();
 }
 
 function renderQuestion() {
-  const quiz = QUIZZES[state.currentTopic];
+  const quiz = getQuiz(state.currentTopic);
   const qIdx = state.currentIndex;
   const question = quiz.questions[qIdx];
   state.answered = false;
@@ -416,7 +722,7 @@ function selectChoice(idx) {
   if (state.answered) return;
   state.answered = true;
 
-  const quiz = QUIZZES[state.currentTopic];
+  const quiz = getQuiz(state.currentTopic);
   const question = quiz.questions[state.currentIndex];
   const correctIdx = question.answer;
   const isCorrect = idx === correctIdx;
@@ -445,7 +751,7 @@ function selectChoice(idx) {
 }
 
 function nextQuestion() {
-  const quiz = QUIZZES[state.currentTopic];
+  const quiz = getQuiz(state.currentTopic);
   if (state.currentIndex < quiz.questions.length - 1) {
     state.currentIndex += 1;
     renderQuestion();
@@ -456,12 +762,12 @@ function nextQuestion() {
 }
 
 function showResults() {
-  const quiz = QUIZZES[state.currentTopic];
+  const quiz = getQuiz(state.currentTopic);
   $("final-score").textContent = String(state.score);
   $("final-total").textContent = String(quiz.questions.length);
   const pct = state.score / quiz.questions.length;
   let msg;
-  if (pct === 1) msg = "Perfect score — you really know your LLMs!";
+  if (pct === 1) msg = "Perfect score — nailed it!";
   else if (pct >= 0.8) msg = "Excellent work. Solid grasp of the material.";
   else if (pct >= 0.6) msg = "Good effort — review the explanations and try again.";
   else if (pct >= 0.4) msg = "Some gaps to fill. The explanations are a great place to start.";
@@ -471,6 +777,7 @@ function showResults() {
 }
 
 function init() {
+  renderCollectionTabs();
   renderTopics();
 
   $("back-home").addEventListener("click", () => showScreen("home"));

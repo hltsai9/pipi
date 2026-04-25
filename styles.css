@@ -91,6 +91,42 @@ main {
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* Collection tabs */
+.collection-tabs {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  margin-top: 12px;
+  padding: 6px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+}
+.collection-tab {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.collection-tab:hover {
+  color: var(--text);
+}
+.collection-tab.active {
+  background: var(--primary);
+  color: white;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
+}
+
 /* Home */
 .hero {
   text-align: center;
