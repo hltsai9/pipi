@@ -4,8 +4,8 @@ registerQuiz({
   title: "What is Neural Network?",
   icon: "N",
   description: "The basic ingredients: neurons, layers, weights, training, and what neural networks actually are.",
-  createdAt: "2026-04-25T19:02:00Z",
-  updatedAt: "2026-04-25T19:02:00Z",
+  createdAt: "2026-04-26T16:57:00Z",
+  updatedAt: "2026-04-26T16:57:00Z",
   questions: [
     {
       q: "At the most basic level, what is an artificial neural network?",
