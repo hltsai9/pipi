@@ -49,6 +49,80 @@ match the existing content; the audit script enforces them.
 6. **Explanations.** Always present, naming the correct concept and briefly
    addressing why common wrong answers are wrong.
 
+## Question generation framework
+
+When authoring a topic from scratch, structure the question set by learning
+purpose into four categories. This is the canonical generation prompt for
+this project; follow it unless the user opts out.
+
+> You are generating a study question set for [TOPIC]. Produce questions
+> organized by learning purpose AND format.
+>
+> **Four question categories**
+>
+> 1. **Priming** (3–5 questions) — Designed to be answered BEFORE studying.
+>    Activate prior knowledge and surface assumptions. Include at least one
+>    prediction / hypothesis question. Format: open-ended, no answer key
+>    (these are for self-reflection).
+>
+> 2. **Comprehension** (8–10 questions) — Test understanding of core
+>    concepts. Mix factual recall, explanation ("why"), and contrast ("how
+>    does X differ from Y"). Format: flashcards.
+>
+> 3. **Application** (6–8 questions) — Novel scenarios that require
+>    applying the concept, not restating it. Avoid textbook examples.
+>    Format: multiple choice.
+>
+> 4. **Transfer / Synthesis** (3–4 questions) — Connect this topic to
+>    others, identify edge cases, or explain what changes if a key
+>    assumption is altered. Format: mix of flashcards and multiple choice
+>    (choose per question based on what fits).
+>
+> **Format specs**
+>
+> - **Flashcards.** Front: a single clear question, term, or concept.
+>   Back: concise answer, 1–3 sentences max — no paragraphs.
+>
+> - **Multiple choice.** Question stem + four options (A–D). Plausible
+>   distractors targeting common misconceptions; no obviously silly
+>   options. Correct answer marked. One-sentence explanation of why the
+>   correct answer is right AND why at least one tempting wrong answer
+>   is wrong.
+
+### Mapping to the current engine
+
+Today the runtime renders only the multiple-choice variant — there is no
+flashcard or open-ended UI. Two ways to honor the framework:
+
+- **Default.** Plan all four categories during generation, but author
+  every question as multiple-choice in the file. Use the category intents
+  to drive what each MC question tests — priming MCs predict ("If you
+  increase X, what happens to Y?"); comprehension MCs explain a core
+  mechanism; application MCs present novel scenarios; synthesis MCs
+  connect topics or alter an assumption. Tag each question with a
+  `category` field for traceability:
+
+      {
+        q: "...",
+        choices: [...],
+        answer: 1,
+        explanation: "...",
+        category: "comprehension"   // priming | comprehension | application | synthesis
+      }
+
+  The engine ignores unknown fields, so this is forward-compatible. A
+  future UI can group or filter by `category`.
+
+- **Engine extension.** If the user explicitly wants real flashcards or
+  open-ended priming questions surfaced in the UI, propose extending
+  `app.js` first and confirm before doing that work. Out of scope for
+  this skill by default.
+
+For a small topic where 20+ MCs feels excessive, scale the counts down
+proportionally but keep all four categories represented and keep at least
+5 MCs total (per design rule 5). For a big topic, follow the upper end of
+each category's range.
+
 ## A. Add a topic
 
 ### A1. Suggest the best collection (deterministic procedure)
@@ -91,7 +165,12 @@ Wait for the user's go-ahead before continuing.
 `quizzes/<collection>-<kebab-slug>.js`. Match the existing naming pattern
 (e.g. `llms-rag.js`, `llms-nn-attention.js`).
 
-### A3. Write the file
+### A3. Plan the question set, then write the file
+
+Plan the question set using the four-category framework above. Decide the
+counts up front (e.g. 4 priming + 8 comprehension + 6 application + 3
+synthesis = 21 MCs) and tag each question with a `category` field. Then
+apply the design rules from the previous section as you write.
 
 Schema:
 
