@@ -42,9 +42,9 @@ audit script enforces them.
 
 4. **Always 4 choices.** Unless the user explicitly asks otherwise.
 
-5. **Question count.** Target the framework's ranges below (~20 MCs total)
-   for substantial topics. Hard minimum 5. For smaller topics, scale all
-   four categories down proportionally but keep them all represented.
+5. **Question count.** 5–7 questions per topic by default. Go bigger if
+   the topic warrants it. Cover fundamentals, common misconceptions, and
+   one or two specifics.
 
 6. **Explanations.** Always present, naming the correct concept and briefly
    addressing why a tempting wrong answer is wrong.
@@ -73,65 +73,18 @@ All four options are within a few characters of each other; the correct
 answer is at index 0 (vary across the file); each distractor describes a
 real-but-different operation a learner could plausibly confuse.
 
-## Question generation framework
+## Mix of question intents
 
-When authoring a topic from scratch, structure the question set by learning
-purpose into four categories. This is the canonical generation prompt;
-follow it unless the user opts out.
+Aim for a healthy mix across the question set, not all the same flavor:
 
-> You are generating a study question set for [TOPIC]. Produce questions
-> organized by learning purpose AND format.
->
-> **Four question categories**
->
-> 1. **Priming** (3–5 questions) — Designed to be answered BEFORE studying.
->    Activate prior knowledge and surface assumptions. Include at least one
->    prediction / hypothesis question. Format: open-ended, no answer key
->    (these are for self-reflection).
->
-> 2. **Comprehension** (8–10 questions) — Test understanding of core
->    concepts. Mix factual recall, explanation ("why"), and contrast ("how
->    does X differ from Y"). Format: flashcards.
->
-> 3. **Application** (6–8 questions) — Novel scenarios that require
->    applying the concept, not restating it. Avoid textbook examples.
->    Format: multiple choice.
->
-> 4. **Transfer / Synthesis** (3–4 questions) — Connect this topic to
->    others, identify edge cases, or explain what changes if a key
->    assumption is altered. Format: mix of flashcards and multiple choice.
->
-> **Format specs**
->
-> - **Flashcards.** Front: a single clear question, term, or concept.
->   Back: concise answer, 1–3 sentences max — no paragraphs.
->
-> - **Multiple choice.** Question stem + four options (A–D). Plausible
->   distractors targeting common misconceptions; no obviously silly
->   options. Correct answer marked. One-sentence explanation of why the
->   correct answer is right AND why at least one tempting wrong answer
->   is wrong.
+- **Recall / definition** — names, formulas, what something is.
+- **Explanation** — why a mechanism works the way it does.
+- **Contrast** — how X differs from a similar Y.
+- **Application** — apply the concept to a small novel scenario.
+- **Synthesis** — connect to another topic, or what changes if a key
+  assumption is altered.
 
-### Mapping to the current engine
-
-The runtime renders only multiple-choice — no flashcard or open-ended UI
-yet. Plan all four categories during generation, then author every
-question as multiple-choice in the file. Use the category intents to
-drive what each question tests:
-
-- Priming MCs predict ("If you increase X, what happens to Y?")
-- Comprehension MCs explain a core mechanism
-- Application MCs present novel scenarios
-- Synthesis MCs connect topics or alter an assumption
-
-Record the breakdown in a single header comment at the top of the file
-(no per-question `category` field — keeps the data clean):
-
-    // 4 priming · 8 comprehension · 6 application · 3 synthesis = 21 MCs
-
-If the user explicitly wants real flashcards or open-ended priming
-questions in the UI, propose extending `app.js` first and confirm before
-doing that work.
+A 5-question topic should have at least 3 of these flavors.
 
 ## A. Add a topic
 
@@ -148,15 +101,12 @@ naming pattern (e.g. `llms-rag.js`, `llms-nn-attention.js`). Read one
 existing file in the same collection first to align tone, icon style,
 and description voice with the rest.
 
-### A3. Plan the question set, then write the file
+### A3. Write the file
 
-Plan counts up front using the four-category framework (e.g. 4 priming +
-8 comprehension + 6 application + 3 synthesis = 21 MCs) and put them in
-the header comment. Apply the design rules as you write.
+Apply the design rules and intent mix as you write.
 
 Schema:
 
-    // 4 priming · 8 comprehension · 6 application · 3 synthesis = 21 MCs
     registerQuiz({
       collection: "llms",
       key: "rag",                              // unique within collection
@@ -172,7 +122,7 @@ Schema:
           answer: 2,
           explanation: "Why correct is correct, and why a tempting wrong answer is wrong."
         }
-        // 5+ questions
+        // 5–7 questions
       ]
     });
 
