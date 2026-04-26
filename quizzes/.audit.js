@@ -65,42 +65,60 @@ for (const ck of Object.keys(cols)) {
       errors.push(`${where}: ${t.questions.length} questions (minimum 5)`);
     }
 
+    let mcCount = 0;
     for (const [i, q] of t.questions.entries()) {
       total++;
       const tag = `${where} Q${i + 1}`;
+      const type = q.type || "multiple_choice";
 
-      if (typeof q.q !== "string" || !q.q.trim()) errors.push(`${tag}: missing q`);
-      if (!Array.isArray(q.choices) || q.choices.length !== 4) {
-        errors.push(`${tag}: must have exactly 4 choices (got ${q.choices ? q.choices.length : 0})`);
-        continue;
-      }
-      if (typeof q.answer !== "number" || q.answer < 0 || q.answer >= q.choices.length) {
-        errors.push(`${tag}: answer index ${q.answer} out of range`);
-        continue;
-      }
-      if (typeof q.explanation !== "string" || !q.explanation.trim()) {
-        errors.push(`${tag}: missing explanation`);
+      if (typeof q.q !== "string" || !q.q.trim()) {
+        errors.push(`${tag}: missing question text`);
       }
 
-      positionCounts[q.answer]++;
+      if (type === "multiple_choice") {
+        mcCount++;
+        if (!Array.isArray(q.choices) || q.choices.length !== 4) {
+          errors.push(`${tag}: MC must have exactly 4 choices (got ${q.choices ? q.choices.length : 0})`);
+          continue;
+        }
+        if (typeof q.answer !== "number" || q.answer < 0 || q.answer >= q.choices.length) {
+          errors.push(`${tag}: answer index ${q.answer} out of range`);
+          continue;
+        }
+        if (typeof q.explanation !== "string" || !q.explanation.trim()) {
+          errors.push(`${tag}: missing explanation`);
+        }
 
-      const lens = q.choices.map(c => c.length);
-      const correctLen = lens[q.answer];
-      const others = lens.filter((_, j) => j !== q.answer);
-      const avg = others.reduce((a, b) => a + b, 0) / others.length;
-      if (correctLen === Math.max(...lens) && correctLen > avg * 1.4) {
-        errors.push(
-          `${tag}: length-tell — correct option ${correctLen} chars vs avg distractor ${avg.toFixed(0)}`
-        );
+        positionCounts[q.answer]++;
+
+        const lens = q.choices.map(c => c.length);
+        const correctLen = lens[q.answer];
+        const others = lens.filter((_, j) => j !== q.answer);
+        const avg = others.reduce((a, b) => a + b, 0) / others.length;
+        if (correctLen === Math.max(...lens) && correctLen > avg * 1.4) {
+          errors.push(
+            `${tag}: length-tell — correct option ${correctLen} chars vs avg distractor ${avg.toFixed(0)}`
+          );
+        }
+      } else if (type === "flashcard") {
+        if (typeof q.back !== "string" || !q.back.trim()) {
+          errors.push(`${tag}: flashcard missing back/answer`);
+        }
+      } else if (type === "open_ended") {
+        // q text already validated; nothing else required
+      } else {
+        errors.push(`${tag}: unknown question type '${type}'`);
       }
     }
 
-    const maxAtOnePos = Math.max(...positionCounts);
-    if (t.questions.length > 0 && maxAtOnePos / t.questions.length > 0.5) {
-      const idx = positionCounts.indexOf(maxAtOnePos);
-      warnings.push(
-        `${where}: ${maxAtOnePos}/${t.questions.length} answers at index ${idx} — vary positions`
-      );
+    if (mcCount > 0) {
+      const maxAtOnePos = Math.max(...positionCounts);
+      if (maxAtOnePos / mcCount > 0.5) {
+        const idx = positionCounts.indexOf(maxAtOnePos);
+        warnings.push(
+          `${where}: ${maxAtOnePos}/${mcCount} MC answers at index ${idx} — vary positions`
+        );
+      }
     }
   }
 }

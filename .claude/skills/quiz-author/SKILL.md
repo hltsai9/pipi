@@ -7,8 +7,18 @@ description: Author quiz content for this project's quiz site under quizzes/ —
 
 The site lives at the repo root: `index.html`, `app.js`, `styles.css`, and a
 `quizzes/` folder holding one file per topic plus `_collections.js`. Topics
-self-register via `registerQuiz({...})`; collections via
-`registerCollection({...})`.
+self-register; collections via `registerCollection({...})`.
+
+There are two registration APIs:
+
+- **`registerQuiz`** — flat list of multiple-choice questions. Used by the
+  `llms` and `gpus` collections.
+- **`registerStructuredQuiz`** — sectioned by learning purpose
+  (priming / comprehension / application / transfer_synthesis), with mixed
+  question types (`multiple_choice`, `flashcard`, `open_ended`) and a
+  `difficulty` label. Used by the `deep-dive` collection.
+
+Pick the API based on which collection you're authoring into.
 
 This skill covers four operations:
 
@@ -103,9 +113,10 @@ and description voice with the rest.
 
 ### A3. Write the file
 
-Apply the design rules and intent mix as you write.
+Apply the design rules and intent mix as you write. Use the schema for
+the collection you're targeting.
 
-Schema:
+#### `registerQuiz` (used by `llms` and `gpus`)
 
     registerQuiz({
       collection: "llms",
@@ -123,6 +134,61 @@ Schema:
           explanation: "Why correct is correct, and why a tempting wrong answer is wrong."
         }
         // 5–7 questions
+      ]
+    });
+
+#### `registerStructuredQuiz` (used by `deep-dive`)
+
+Required structure: four sections (`priming`, `comprehension`,
+`application`, `transfer_synthesis`), each with its own questions.
+Question type per section:
+
+- **Priming** (3–5) — type `open_ended`. Pre-study reflection prompts;
+  no answer key, no scoring.
+- **Comprehension** (5–10) — type `flashcard`. Front (`question`) and
+  back (`answer`); 1–3 sentences max on the back.
+- **Application** (4–8) — type `multiple_choice`. Same MC design rules
+  apply (length balance, position variety, plausible distractors,
+  explanation).
+- **Transfer / Synthesis** (2–4) — mix of `flashcard` and
+  `multiple_choice`; pick whichever fits each question.
+
+Every question must have a `difficulty` of `easy`, `medium`, or `hard`.
+
+    registerStructuredQuiz({
+      collection: "deep-dive",
+      key: "rag",
+      title: "Retrieval-Augmented Generation",
+      icon: "R",
+      description: "...",
+      createdAt: "2026-04-26T18:00:00Z",
+      updatedAt: "2026-04-26T18:00:00Z",
+      sections: [
+        { category: "priming", questions: [
+          { type: "open_ended",
+            question: "Before reading: what would you guess RAG does?",
+            difficulty: "easy" }
+        ]},
+        { category: "comprehension", questions: [
+          { type: "flashcard",
+            question: "What does RAG stand for?",
+            answer: "Retrieval-Augmented Generation.",
+            difficulty: "easy" }
+        ]},
+        { category: "application", questions: [
+          { type: "multiple_choice",
+            question: "When would you choose RAG over fine-tuning?",
+            options: ["…", "…", "…", "…"],
+            correct_option: "C",
+            explanation: "Why C; why one tempting wrong answer is wrong.",
+            difficulty: "medium" }
+        ]},
+        { category: "transfer_synthesis", questions: [
+          { type: "flashcard",
+            question: "How does RAG relate to in-context learning?",
+            answer: "Both supply external info via the prompt; RAG retrieves it dynamically.",
+            difficulty: "hard" }
+        ]}
       ]
     });
 

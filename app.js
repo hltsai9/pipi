@@ -1,44 +1,58 @@
-/* Tech Quiz — multiple-choice quizzes with explanations.
+/* Tech Quiz — multi-format quizzes with explanations.
  * Pure client-side, no dependencies.
  *
  * ──────────────────────────────────────────────────────────────────────
- *  Adding a new quiz topic
+ *  Two registration APIs
  * ──────────────────────────────────────────────────────────────────────
- *  1. Create a new file in the quizzes/ folder, e.g.
  *
- *       quizzes/llms-prompt-engineering.js
- *
- *     and call registerQuiz from it:
+ *  1) registerQuiz  — flat list of multiple-choice questions.
  *
  *       registerQuiz({
- *         collection: "llms",            // collection key (tab)
- *         key: "prompt-engineering",     // unique within the collection
+ *         collection: "llms",
+ *         key: "prompt-engineering",
  *         title: "Prompt Engineering",
- *         icon: "P",                     // single letter / emoji shown on card
- *         description: "Patterns and pitfalls in prompting LLMs.",
- *         createdAt: "2026-04-25T18:00:00Z",   // ISO 8601 string
- *         updatedAt: "2026-04-25T18:00:00Z",   // ISO 8601 string
+ *         icon: "P",
+ *         description: "...",
+ *         createdAt: "2026-04-25T18:00:00Z",
+ *         updatedAt: "2026-04-25T18:00:00Z",
  *         questions: [
- *           {
- *             q: "Which prompting technique...?",
- *             choices: ["A", "B", "C", "D"],
- *             answer: 2,                 // 0-based index of the correct choice
- *             explanation: "Why C is correct..."
- *           },
- *           // ...more questions
+ *           { q: "...", choices: ["A","B","C","D"], answer: 2,
+ *             explanation: "..." },
+ *           ...
  *         ]
  *       });
  *
- *  2. Add the file to index.html in the "Quiz data" block:
+ *  2) registerStructuredQuiz — sectioned by learning purpose, with
+ *     mixed question types (multiple_choice, flashcard, open_ended).
  *
- *       <script defer src="quizzes/llms-prompt-engineering.js"></script>
+ *       registerStructuredQuiz({
+ *         collection: "deep-dive",
+ *         key: "self-attention",
+ *         title: "Self-Attention",
+ *         icon: "α",
+ *         description: "...",
+ *         createdAt: "2026-04-26T20:30:00Z",
+ *         updatedAt: "2026-04-26T20:30:00Z",
+ *         sections: [
+ *           { category: "priming", questions: [
+ *             { type: "open_ended", question: "...", difficulty: "easy" }
+ *           ]},
+ *           { category: "comprehension", questions: [
+ *             { type: "flashcard", question: "...", answer: "...",
+ *               difficulty: "medium" }
+ *           ]},
+ *           { category: "application", questions: [
+ *             { type: "multiple_choice", question: "...",
+ *               options: ["...","...","...","..."],
+ *               correct_option: "C",
+ *               explanation: "...", difficulty: "hard" }
+ *           ]},
+ *           { category: "transfer_synthesis", questions: [...] }
+ *         ]
+ *       });
  *
- *     The order of <script> tags determines the order of topic cards.
- *
- *  Adding a new collection (a new tab) works the same way: declare it
- *  once with registerCollection({key, title, description}), typically in
- *  quizzes/_collections.js. Quizzes that reference an unknown collection
- *  auto-create one with sensible defaults.
+ *  Add the file to index.html with <script defer src="..."></script>.
+ *  Collections are declared in quizzes/_collections.js.
  * ──────────────────────────────────────────────────────────────────────
  */
 
@@ -71,17 +85,12 @@ const Quiz = (() => {
     if (value === undefined || value === null || value === "") return 0;
     const ms = (typeof value === "number") ? value : new Date(value).getTime();
     if (Number.isNaN(ms)) {
-      throw new Error(`registerQuiz: '${refLabel}' has invalid ${fieldName}: ${value}`);
+      throw new Error(`${refLabel}: invalid ${fieldName}: ${value}`);
     }
     return ms;
   }
 
-  function registerQuiz({ collection, key, title, icon, description, questions, createdAt, updatedAt }) {
-    if (!collection) throw new Error("registerQuiz: 'collection' is required");
-    if (!key) throw new Error("registerQuiz: 'key' is required");
-    if (!Array.isArray(questions) || questions.length === 0) {
-      throw new Error(`registerQuiz: '${collection}/${key}' has no questions`);
-    }
+  function storeTopic(collection, key, title, icon, description, createdAt, updatedAt, questions) {
     const ref = `${collection}/${key}`;
     const created = parseTimestamp(createdAt, "createdAt", ref);
     const updated = parseTimestamp(updatedAt, "updatedAt", ref) || created;
@@ -98,9 +107,62 @@ const Quiz = (() => {
     };
   }
 
+  function registerQuiz({ collection, key, title, icon, description, questions, createdAt, updatedAt }) {
+    if (!collection) throw new Error("registerQuiz: 'collection' is required");
+    if (!key) throw new Error("registerQuiz: 'key' is required");
+    if (!Array.isArray(questions) || questions.length === 0) {
+      throw new Error(`registerQuiz: '${collection}/${key}' has no questions`);
+    }
+    const normalized = questions.map((q) => ({ type: q.type || "multiple_choice", ...q }));
+    storeTopic(collection, key, title, icon, description, createdAt, updatedAt, normalized);
+  }
+
+  const LETTER_TO_INDEX = { A: 0, B: 1, C: 2, D: 3 };
+
+  function registerStructuredQuiz({ collection, key, title, icon, description, sections, createdAt, updatedAt }) {
+    if (!collection) throw new Error("registerStructuredQuiz: 'collection' is required");
+    if (!key) throw new Error("registerStructuredQuiz: 'key' is required");
+    if (!Array.isArray(sections) || sections.length === 0) {
+      throw new Error(`registerStructuredQuiz: '${collection}/${key}' has no sections`);
+    }
+    const flat = [];
+    for (const sec of sections) {
+      const cat = sec.category;
+      for (const q of (sec.questions || [])) {
+        const item = {
+          type: q.type,
+          q: q.question,
+          difficulty: q.difficulty || "",
+          explanation: q.explanation || "",
+          section: cat
+        };
+        if (q.type === "multiple_choice") {
+          item.choices = q.options;
+          const idx = LETTER_TO_INDEX[q.correct_option];
+          if (idx === undefined) {
+            throw new Error(`${collection}/${key}: invalid correct_option '${q.correct_option}'`);
+          }
+          item.answer = idx;
+        } else if (q.type === "flashcard") {
+          item.back = q.answer || "";
+        } else if (q.type === "open_ended") {
+          // no extra fields
+        } else {
+          throw new Error(`${collection}/${key}: unknown question type '${q.type}'`);
+        }
+        flat.push(item);
+      }
+    }
+    if (flat.length === 0) {
+      throw new Error(`registerStructuredQuiz: '${collection}/${key}' has no questions`);
+    }
+    storeTopic(collection, key, title, icon, description, createdAt, updatedAt, flat);
+  }
+
   return {
     registerCollection,
     registerQuiz,
+    registerStructuredQuiz,
     getCollections: () => collections,
     getCollectionOrder: () => collectionOrder.slice()
   };
@@ -108,15 +170,25 @@ const Quiz = (() => {
 
 window.registerCollection = Quiz.registerCollection;
 window.registerQuiz = Quiz.registerQuiz;
+window.registerStructuredQuiz = Quiz.registerStructuredQuiz;
+
+const SECTION_LABELS = {
+  priming: "Priming",
+  comprehension: "Comprehension",
+  application: "Application",
+  transfer_synthesis: "Transfer / Synthesis"
+};
 
 const state = {
   currentCollection: null,
   currentTopic: null,
   currentIndex: 0,
   score: 0,
+  mcTotal: 0,
   answered: false,
-  sortBy: "created",   // "created" | "updated"
-  sortDir: "desc"      // "asc" | "desc"
+  revealed: false,
+  sortBy: "created",
+  sortDir: "desc"
 };
 
 const SORT_OPTIONS = [
@@ -237,14 +309,22 @@ function renderTopics() {
 }
 
 function startQuiz(topicKey) {
+  const quiz = getQuiz(topicKey);
   state.currentTopic = topicKey;
   state.currentIndex = 0;
   state.score = 0;
+  state.mcTotal = quiz.questions.filter((q) => q.type === "multiple_choice").length;
   state.answered = false;
-  $("quiz-title").textContent = getQuiz(topicKey).title;
+  state.revealed = false;
+  $("quiz-title").textContent = quiz.title;
   $("score").textContent = "0";
   showScreen("quiz");
   renderQuestion();
+}
+
+function setHidden(el, hidden) {
+  if (!el) return;
+  el.classList.toggle("hidden", hidden);
 }
 
 function renderQuestion() {
@@ -252,11 +332,48 @@ function renderQuestion() {
   const qIdx = state.currentIndex;
   const question = quiz.questions[qIdx];
   state.answered = false;
+  state.revealed = false;
 
   $("progress-text").textContent = `Question ${qIdx + 1} of ${quiz.questions.length}`;
   $("progress-fill").style.width = `${(qIdx / quiz.questions.length) * 100}%`;
+
+  const sectionLabel = $("section-label");
+  if (question.section && SECTION_LABELS[question.section]) {
+    sectionLabel.textContent = SECTION_LABELS[question.section];
+    setHidden(sectionLabel, false);
+  } else {
+    setHidden(sectionLabel, true);
+  }
+
+  const diffBadge = $("difficulty-badge");
+  if (question.difficulty) {
+    diffBadge.textContent = question.difficulty;
+    diffBadge.className = `difficulty-badge difficulty-${question.difficulty}`;
+    setHidden(diffBadge, false);
+  } else {
+    setHidden(diffBadge, true);
+  }
+
   $("question-text").textContent = question.q;
 
+  setHidden($("choices"), true);
+  setHidden($("flashcard-back"), true);
+  setHidden($("open-ended-note"), true);
+  setHidden($("explanation"), true);
+  setHidden($("reveal-btn"), true);
+  setHidden($("next-btn"), true);
+  $("explanation").classList.remove("correct", "incorrect");
+
+  if (question.type === "multiple_choice") {
+    renderMultipleChoice(question);
+  } else if (question.type === "flashcard") {
+    renderFlashcard(question);
+  } else if (question.type === "open_ended") {
+    renderOpenEnded(question);
+  }
+}
+
+function renderMultipleChoice(question) {
   const choices = $("choices");
   choices.innerHTML = "";
   const letters = ["A", "B", "C", "D", "E", "F"];
@@ -268,11 +385,18 @@ function renderQuestion() {
     li.addEventListener("click", () => selectChoice(i));
     choices.appendChild(li);
   });
+  setHidden(choices, false);
+}
 
-  const explanation = $("explanation");
-  explanation.classList.add("hidden");
-  explanation.classList.remove("correct", "incorrect");
-  $("next-btn").classList.add("hidden");
+function renderFlashcard(question) {
+  $("flashcard-back-text").textContent = question.back || "";
+  setHidden($("reveal-btn"), false);
+}
+
+function renderOpenEnded(question) {
+  $("open-ended-note").textContent = "Reflection question — pause to think, then continue.";
+  setHidden($("open-ended-note"), false);
+  showNextButton();
 }
 
 function selectChoice(idx) {
@@ -295,16 +419,40 @@ function selectChoice(idx) {
     else el.classList.add("dimmed");
   });
 
-  const explanation = $("explanation");
-  explanation.classList.remove("hidden");
-  explanation.classList.add(isCorrect ? "correct" : "incorrect");
-  $("explanation-title").textContent = isCorrect ? "Correct!" : "Not quite.";
-  $("explanation-text").textContent = question.explanation;
+  if (question.explanation) {
+    const explanation = $("explanation");
+    explanation.classList.add(isCorrect ? "correct" : "incorrect");
+    $("explanation-title").textContent = isCorrect ? "Correct!" : "Not quite.";
+    $("explanation-text").textContent = question.explanation;
+    setHidden(explanation, false);
+  }
 
+  showNextButton();
+}
+
+function revealFlashcard() {
+  if (state.revealed) return;
+  state.revealed = true;
+  setHidden($("flashcard-back"), false);
+  setHidden($("reveal-btn"), true);
+
+  const quiz = getQuiz(state.currentTopic);
+  const question = quiz.questions[state.currentIndex];
+  if (question.explanation) {
+    const explanation = $("explanation");
+    $("explanation-title").textContent = "Note";
+    $("explanation-text").textContent = question.explanation;
+    setHidden(explanation, false);
+  }
+  showNextButton();
+}
+
+function showNextButton() {
+  const quiz = getQuiz(state.currentTopic);
   const isLast = state.currentIndex === quiz.questions.length - 1;
   const nextBtn = $("next-btn");
-  nextBtn.textContent = isLast ? "See Results →" : "Next Question →";
-  nextBtn.classList.remove("hidden");
+  nextBtn.textContent = isLast ? "See Results →" : "Next →";
+  setHidden(nextBtn, false);
 }
 
 function nextQuestion() {
@@ -320,15 +468,26 @@ function nextQuestion() {
 
 function showResults() {
   const quiz = getQuiz(state.currentTopic);
+  const total = quiz.questions.length;
+  const reflectionTotal = total - state.mcTotal;
   $("final-score").textContent = String(state.score);
-  $("final-total").textContent = String(quiz.questions.length);
-  const pct = state.score / quiz.questions.length;
+  $("final-total").textContent = String(state.mcTotal);
+  setHidden($("final-mc-suffix"), state.mcTotal === total);
+
   let msg;
-  if (pct === 1) msg = "Perfect score — nailed it!";
-  else if (pct >= 0.8) msg = "Excellent work. Solid grasp of the material.";
-  else if (pct >= 0.6) msg = "Good effort — review the explanations and try again.";
-  else if (pct >= 0.4) msg = "Some gaps to fill. The explanations are a great place to start.";
-  else msg = "Plenty to learn here — read the explanations and give it another go.";
+  if (state.mcTotal === 0) {
+    msg = "Reflection-only set — no score, just contemplation.";
+  } else {
+    const pct = state.score / state.mcTotal;
+    if (pct === 1) msg = "Perfect score — nailed it!";
+    else if (pct >= 0.8) msg = "Excellent work. Solid grasp of the material.";
+    else if (pct >= 0.6) msg = "Good effort — review the explanations and try again.";
+    else if (pct >= 0.4) msg = "Some gaps to fill. The explanations are a great place to start.";
+    else msg = "Plenty to learn here — read the explanations and give it another go.";
+  }
+  if (reflectionTotal > 0) {
+    msg += ` (${reflectionTotal} reflection ${reflectionTotal === 1 ? "question" : "questions"} completed.)`;
+  }
   $("result-message").textContent = msg;
   showScreen("results");
 }
@@ -343,6 +502,7 @@ function init() {
   $("home-btn").addEventListener("click", () => showScreen("home"));
   $("retry-btn").addEventListener("click", () => startQuiz(state.currentTopic));
   $("next-btn").addEventListener("click", nextQuestion);
+  $("reveal-btn").addEventListener("click", revealFlashcard);
 }
 
 document.addEventListener("DOMContentLoaded", init);

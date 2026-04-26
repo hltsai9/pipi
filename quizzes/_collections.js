@@ -12,3 +12,9 @@ registerCollection({
   title: "GPUs",
   description: "Architecture, how GPUs differ from CPUs, and how they evolved into AI accelerators."
 });
+
+registerCollection({
+  key: "deep-dive",
+  title: "Deep Dive",
+  description: "Structured study sets — priming, comprehension, application, and synthesis — mixing flashcards, multiple choice, and open-ended reflection."
+});
