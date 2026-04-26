@@ -5,7 +5,7 @@ registerQuiz({
   icon: "E",
   description: "From n-grams and word embeddings to transformers and modern frontier models.",
   createdAt: "2026-04-25T18:04:00Z",
-  updatedAt: "2026-04-25T18:04:00Z",
+  updatedAt: "2026-04-26T17:50:00Z",
   questions: [
     {
       q: "Which 2017 paper introduced the architecture that underpins essentially all modern large language models?",
@@ -21,43 +21,43 @@ registerQuiz({
     {
       q: "Roughly chronologically, which ordering reflects the evolution of language modeling?",
       choices: [
-        "Transformers → n-gram models → RNN/LSTM → word2vec",
-        "n-gram models → word2vec/GloVe → RNN/LSTM → Transformers (BERT/GPT) → modern LLMs",
-        "BERT → n-gram → GPT-4 → word2vec",
-        "GPT-4 → LSTM → n-gram → BERT"
+        "Transformers → n-gram models → RNN/LSTM → word2vec → modern LLMs",
+        "BERT → n-gram counts → GPT-4 → word2vec → recurrent encoder-decoders",
+        "n-gram models → word2vec/GloVe → RNN/LSTM → Transformers → modern LLMs",
+        "GPT-4 → LSTM → n-gram counts → BERT → distributed word embeddings"
       ],
-      answer: 1,
+      answer: 2,
       explanation: "The rough trajectory: statistical n-gram models (pre-2010s) → distributed word embeddings like word2vec/GloVe (2013–14) → recurrent encoder-decoders with attention (LSTMs, ~2014–17) → Transformers and pretrained models like BERT/GPT (2018+) → today's frontier LLMs."
     },
     {
       q: "What was the key insight of BERT (2018) versus prior approaches?",
       choices: [
-        "Replacing transformers with LSTMs",
-        "Using a left-to-right autoregressive objective",
-        "Bidirectional masked-language-model pretraining followed by fine-tuning on downstream tasks",
-        "Training only on labeled data"
+        "Replacing the Transformer encoder with stacks of LSTMs for richer context",
+        "Bidirectional masked-LM pretraining followed by per-task fine-tuning",
+        "Using a strict left-to-right autoregressive objective for every task",
+        "Training only on labeled task data, with no large unsupervised pretraining"
       ],
-      answer: 2,
+      answer: 1,
       explanation: "BERT pretrained a Transformer encoder with masked language modeling (predict missing tokens using both left and right context) plus next-sentence prediction, then fine-tuned a small head per task. It set new SOTA across NLP and popularized the 'pretrain + fine-tune' paradigm."
     },
     {
       q: "Which capability was popularized by GPT-3 (2020) and is largely a consequence of scale?",
       choices: [
-        "Image generation",
-        "In-context (few-shot) learning — solving new tasks from a few examples in the prompt, with no weight updates",
-        "Reinforcement learning",
-        "Speech synthesis"
+        "End-to-end image generation directly from text descriptions",
+        "Reinforcement learning policies that play Atari and Go at superhuman level",
+        "In-context few-shot learning — new tasks from examples, no weight updates",
+        "Real-time speech synthesis with multilingual prosody and emotion control"
       ],
-      answer: 1,
+      answer: 2,
       explanation: "GPT-3 showed that at sufficient scale, a single autoregressive model could perform new tasks from a handful of examples in the prompt (in-context / few-shot learning). This capability emerged with scale and reframed how people use LLMs — via prompting rather than fine-tuning."
     },
     {
       q: "Scaling laws (Kaplan et al., 2020; Hoffmann et al., 2022 'Chinchilla') describe how loss scales with which factors?",
       choices: [
-        "Only the number of parameters",
-        "Model size, dataset size, and compute — and how to balance them",
-        "GPU brand and operating system",
-        "Number of attention heads only"
+        "Only the total number of parameters in the model, in isolation",
+        "Model size, dataset size, and training compute — and how to balance them",
+        "GPU brand, operating system, and the deep-learning framework being used",
+        "Just the number of attention heads, holding everything else fixed"
       ],
       answer: 1,
       explanation: "Kaplan et al. found smooth power-law relationships between loss and parameters/data/compute. Chinchilla (DeepMind, 2022) corrected the recipe: for a fixed compute budget you should train smaller models on much more data than was previously typical — model and data should scale together."
@@ -66,20 +66,20 @@ registerQuiz({
       q: "Which milestone marked LLMs becoming a mainstream consumer product?",
       choices: [
         "The release of word2vec (2013)",
+        "The publication of the Transformer paper (2017)",
         "The release of BERT (2018)",
-        "The launch of ChatGPT (November 2022)",
-        "The publication of the Transformer paper (2017)"
+        "The launch of ChatGPT (November 2022)"
       ],
-      answer: 2,
+      answer: 3,
       explanation: "ChatGPT's launch in late 2022 took LLMs from a research/developer tool to a household product, reaching 100M users within ~2 months. It also accelerated investment, multimodal extensions, agentic use cases, and the broader 'LLM era' of AI."
     },
     {
       q: "Which trend characterizes frontier LLMs from ~2023 onward?",
       choices: [
-        "A return to recurrent neural networks",
-        "Multimodality (text + images + audio), longer context windows, tool use, and explicit reasoning models",
-        "Abandoning transformers entirely for symbolic AI",
-        "Pure unsupervised training with no post-training"
+        "A general return to recurrent neural networks for long-range modeling",
+        "Multimodality, long contexts, tool use, and explicit reasoning models",
+        "Abandoning transformers entirely in favor of symbolic AI systems",
+        "Pure unsupervised pretraining only, with no post-training of any kind"
       ],
       answer: 1,
       explanation: "Recent frontier LLMs (GPT-4o, Claude 3/4, Gemini, Llama 3+) extend the transformer recipe with multimodal inputs/outputs, much longer context (100K–1M+ tokens), native tool/function calling, and explicit 'thinking' / reasoning modes. The transformer backbone has stayed; the surrounding capabilities have exploded."
