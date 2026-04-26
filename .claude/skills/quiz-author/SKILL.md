@@ -1,6 +1,6 @@
 ---
 name: quiz-author
-description: Use when authoring quiz content for this project's quiz site (root index.html + app.js + quizzes/ folder, with collections like LLMs and GPUs). Covers four operations - add a topic, add a collection, rewrite/balance existing options, audit topics for design problems. Trigger phrases - "add a topic / quiz / question set", "new quiz on X", "make a quiz about X", "generate a quiz on X", "create a topic for X", "add a collection / category / tab", "audit the quizzes", "audit quiz options", "rewrite the options", "balance the options", "fix the length tell", "rebalance correct-answer positions".
+description: Author quiz content for this project's quiz site under quizzes/ — add a topic, add a collection, rewrite/balance options, or audit topics for design problems. Triggers on phrases like "add a quiz on X", "make a quiz about X", "audit the quizzes", "rewrite the options".
 ---
 
 # Quiz Author
@@ -10,7 +10,7 @@ The site lives at the repo root: `index.html`, `app.js`, `styles.css`, and a
 self-register via `registerQuiz({...})`; collections via
 `registerCollection({...})`.
 
-This skill covers four operations, each with its own flow below:
+This skill covers four operations:
 
 - **A. Add a topic** to an existing collection.
 - **B. Add a collection** (new top-level tab).
@@ -22,13 +22,13 @@ and report 0 errors before declaring success.
 
 ## Always: question design rules
 
-These rules are non-negotiable for any choice you author or rewrite. They
-match the existing content; the audit script enforces them.
+These rules are non-negotiable for any choice you author or rewrite. The
+audit script enforces them.
 
 1. **Length balance.** The correct answer must not be the longest option by
    a noticeable margin. Heuristic: each option within ~1.4× the average
-   length of the others. Either trim the correct answer or beef up
-   distractors with realistic, on-topic detail until lengths are comparable.
+   length of the others. Trim the correct answer or beef up distractors
+   with realistic, on-topic detail until lengths are comparable.
 
 2. **Distractor quality.** Distractors must be plausible and on-topic —
    wrong for a real reason a learner could mistake. Avoid joke options
@@ -42,18 +42,42 @@ match the existing content; the audit script enforces them.
 
 4. **Always 4 choices.** Unless the user explicitly asks otherwise.
 
-5. **At least 5 questions per topic.** No upper limit — go bigger if the
-   topic warrants it. Cover fundamentals, common misconceptions, and one or
-   two specifics.
+5. **Question count.** Target the framework's ranges below (~20 MCs total)
+   for substantial topics. Hard minimum 5. For smaller topics, scale all
+   four categories down proportionally but keep them all represented.
 
 6. **Explanations.** Always present, naming the correct concept and briefly
-   addressing why common wrong answers are wrong.
+   addressing why a tempting wrong answer is wrong.
+
+7. **Use today's actual date.** Set `createdAt` (and `updatedAt` on
+   creation) to today's ISO 8601 timestamp. If unsure, run `date -u`
+   before writing the file — never guess.
+
+### Worked example
+
+A length-balanced, position-varied question:
+
+    {
+      q: "What does softmax produce, given a vector of raw scores?",
+      choices: [
+        "A vector of values in [0, 1] that sum to 1, scaled by exp",
+        "A vector of values in [-1, 1] centered around the input mean",
+        "A vector of binary indicators marking the largest input score",
+        "A vector of integer ranks of the inputs from lowest to highest"
+      ],
+      answer: 0,
+      explanation: "Softmax exponentiates and normalizes, yielding a probability distribution. The bounded [-1, 1] form describes tanh, not softmax."
+    }
+
+All four options are within a few characters of each other; the correct
+answer is at index 0 (vary across the file); each distractor describes a
+real-but-different operation a learner could plausibly confuse.
 
 ## Question generation framework
 
 When authoring a topic from scratch, structure the question set by learning
-purpose into four categories. This is the canonical generation prompt for
-this project; follow it unless the user opts out.
+purpose into four categories. This is the canonical generation prompt;
+follow it unless the user opts out.
 
 > You are generating a study question set for [TOPIC]. Produce questions
 > organized by learning purpose AND format.
@@ -75,8 +99,7 @@ this project; follow it unless the user opts out.
 >
 > 4. **Transfer / Synthesis** (3–4 questions) — Connect this topic to
 >    others, identify edge cases, or explain what changes if a key
->    assumption is altered. Format: mix of flashcards and multiple choice
->    (choose per question based on what fits).
+>    assumption is altered. Format: mix of flashcards and multiple choice.
 >
 > **Format specs**
 >
@@ -91,116 +114,74 @@ this project; follow it unless the user opts out.
 
 ### Mapping to the current engine
 
-Today the runtime renders only the multiple-choice variant — there is no
-flashcard or open-ended UI. Two ways to honor the framework:
+The runtime renders only multiple-choice — no flashcard or open-ended UI
+yet. Plan all four categories during generation, then author every
+question as multiple-choice in the file. Use the category intents to
+drive what each question tests:
 
-- **Default.** Plan all four categories during generation, but author
-  every question as multiple-choice in the file. Use the category intents
-  to drive what each MC question tests — priming MCs predict ("If you
-  increase X, what happens to Y?"); comprehension MCs explain a core
-  mechanism; application MCs present novel scenarios; synthesis MCs
-  connect topics or alter an assumption. Tag each question with a
-  `category` field for traceability:
+- Priming MCs predict ("If you increase X, what happens to Y?")
+- Comprehension MCs explain a core mechanism
+- Application MCs present novel scenarios
+- Synthesis MCs connect topics or alter an assumption
 
-      {
-        q: "...",
-        choices: [...],
-        answer: 1,
-        explanation: "...",
-        category: "comprehension"   // priming | comprehension | application | synthesis
-      }
+Record the breakdown in a single header comment at the top of the file
+(no per-question `category` field — keeps the data clean):
 
-  The engine ignores unknown fields, so this is forward-compatible. A
-  future UI can group or filter by `category`.
+    // 4 priming · 8 comprehension · 6 application · 3 synthesis = 21 MCs
 
-- **Engine extension.** If the user explicitly wants real flashcards or
-  open-ended priming questions surfaced in the UI, propose extending
-  `app.js` first and confirm before doing that work. Out of scope for
-  this skill by default.
-
-For a small topic where 20+ MCs feels excessive, scale the counts down
-proportionally but keep all four categories represented and keep at least
-5 MCs total (per design rule 5). For a big topic, follow the upper end of
-each category's range.
+If the user explicitly wants real flashcards or open-ended priming
+questions in the UI, propose extending `app.js` first and confirm before
+doing that work.
 
 ## A. Add a topic
 
-### A1. Suggest the best collection (deterministic procedure)
+### A1. Pick a collection
 
-Don't silently default — score the topic against existing collections and
-surface your reasoning. Steps:
+Read `quizzes/_collections.js` and skim the topic titles already in each
+collection. Propose the best fit to the user with a one-line rationale.
+If two are plausible, ask. If none fit, switch to flow B.
 
-1. **Build the candidate keyword set** from the user's request. Take the
-   topic name plus any descriptive phrases they typed. Lowercase, split on
-   non-alphanumerics, drop stopwords (`a, an, the, of, in, and, or, for,
-   to, with, on, about, is, are, this, that, these, those`) and tokens
-   shorter than 3 characters. Result: a set `K`.
+### A2. Pick a slug, glance at neighbors
 
-2. **Build each collection's vocabulary** by reading
-   `quizzes/_collections.js` plus every existing topic file in that
-   collection. Concatenate the collection's `title` + `description` and
-   every topic's `title` + `description`. Tokenize with the same rule.
-   Result per collection: a set `V_c`.
-
-3. **Score** each collection as `|K ∩ V_c|` (count of keywords that overlap).
-
-4. **Decide:**
-   - If the top score is `≥ 2` and beats the runner-up by `≥ 1`, propose
-     that collection.
-   - If the top score is `0` or all collections tie at a low score,
-     propose creating a new collection (switch to flow B).
-   - Otherwise present the top two and ask the user to pick.
-
-5. **Show your work** to the user — list the matching keywords for the
-   proposed collection. Example:
-
-   > "RAG" overlaps with the LLMs collection on `retrieval, generation,
-   > augmented, language` (score 4) and with GPUs on nothing (score 0).
-   > Proposing `llms`. OK?
-
-Wait for the user's go-ahead before continuing.
-
-### A2. Pick a slug and filename
-
-`quizzes/<collection>-<kebab-slug>.js`. Match the existing naming pattern
-(e.g. `llms-rag.js`, `llms-nn-attention.js`).
+Filename: `quizzes/<collection>-<kebab-slug>.js`, matching the existing
+naming pattern (e.g. `llms-rag.js`, `llms-nn-attention.js`). Read one
+existing file in the same collection first to align tone, icon style,
+and description voice with the rest.
 
 ### A3. Plan the question set, then write the file
 
-Plan the question set using the four-category framework above. Decide the
-counts up front (e.g. 4 priming + 8 comprehension + 6 application + 3
-synthesis = 21 MCs) and tag each question with a `category` field. Then
-apply the design rules from the previous section as you write.
+Plan counts up front using the four-category framework (e.g. 4 priming +
+8 comprehension + 6 application + 3 synthesis = 21 MCs) and put them in
+the header comment. Apply the design rules as you write.
 
 Schema:
 
+    // 4 priming · 8 comprehension · 6 application · 3 synthesis = 21 MCs
     registerQuiz({
       collection: "llms",
-      key: "rag",                                // unique within collection
+      key: "rag",                              // unique within collection
       title: "Retrieval-Augmented Generation",
-      icon: "R",                                 // single letter or symbol
+      icon: "R",                               // single letter or symbol
       description: "One-line summary shown on the topic card.",
-      createdAt: "2026-04-26T18:00:00Z",         // ISO 8601, today's date
+      createdAt: "2026-04-26T18:00:00Z",
       updatedAt: "2026-04-26T18:00:00Z",
       questions: [
         {
           q: "Question stem ending with a question mark or colon?",
           choices: ["A …", "B …", "C …", "D …"],
           answer: 2,
-          explanation: "Why the correct choice is correct, plus context."
-        },
+          explanation: "Why correct is correct, and why a tempting wrong answer is wrong."
+        }
         // 5+ questions
       ]
     });
 
-Apply the design rules above as you write.
-
 ### A4. Wire it into `index.html`
 
-Add one `<script defer>` line in the appropriate collection block. Use the
-highest `?v=` version already present (bump it if you're also touching
-existing files). Sort order is independent of script order — it's by
-`createdAt`.
+Add one `<script defer>` line in the appropriate collection block. A new
+file inherits the current highest `?v=` already present in the file. If
+you also edit existing quiz files, bump every `?v=` (including `app.js`
+and `styles.css`) so browsers refetch.
 
 ### A5. Verify
 
@@ -210,8 +191,7 @@ Run `node quizzes/.audit.js`. Re-author until 0 errors.
 
 1. Add a `registerCollection({key, title, description})` call to
    `quizzes/_collections.js`.
-2. Suggest 2–3 starter topics for the collection and run flow A for each
-   (separate file per topic).
+2. Suggest 2–3 starter topics for the collection and run flow A for each.
 3. Verify with `node quizzes/.audit.js`.
 
 ## C. Rewrite or balance an existing topic
@@ -220,13 +200,11 @@ Use when the user says options feel telegraphed, distractors feel weak,
 correct answer is always at one position, etc.
 
 1. Read the file.
-2. For each question, identify which design rule it violates (length
-   imbalance, weak distractor, position monotony) and rewrite the choices
-   accordingly. Keep the question stem and explanation intact unless the
-   explanation references a specific (now-changed) wording.
-3. Bump `updatedAt` on the file to today's ISO 8601 timestamp.
-4. Bump the file's `?v=` query string in `index.html` so browsers fetch
-   the new version.
+2. For each question, identify which design rule it violates and rewrite
+   the choices accordingly. Keep the question stem and explanation intact
+   unless the explanation references a specific (now-changed) wording.
+3. Bump `updatedAt` to today's ISO 8601 timestamp.
+4. Bump the file's `?v=` query string in `index.html`.
 5. Verify with `node quizzes/.audit.js`.
 
 ## D. Audit
@@ -238,17 +216,26 @@ Run `node quizzes/.audit.js`. The script reports:
 - Length-tell flags — errors.
 - Position imbalance per topic (>50% of answers at one index) — warnings.
 
-If the user asked for a pure audit (no fixes), report findings and stop.
-If they asked for a fix, proceed with flow C on the offending files.
+If the user asked for a pure audit, report findings and stop. If they
+asked for a fix, proceed with flow C on the offending files.
 
 ## Reporting back to the user
 
-When done, tell them: which files changed, how many questions added or
-edited, the audit result, and to hard-refresh the page if anything that
-affects the browser changed (HTML or quiz data).
+Summarize: which files changed, how many questions added or edited, the
+audit result, and to hard-refresh the page if anything that affects the
+browser changed (HTML or quiz data).
+
+## Version control
+
+This project's branch instructions require committing and pushing each
+change to the designated feature branch. When work is complete:
+
+- Stage only the files this skill touched.
+- Write a focused commit message.
+- Push to the designated feature branch.
+- Don't open a PR unless the user asks.
 
 ## Out of scope
 
-- Don't commit or push. The user directs version control.
 - Don't modify `app.js` or `styles.css` unless explicitly asked.
 - Don't create README/documentation files.
