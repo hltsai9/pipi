@@ -16,7 +16,7 @@ There are two registration APIs:
 - **`registerStructuredQuiz`** — sectioned by learning purpose
   (priming / comprehension / application / transfer_synthesis), with mixed
   question types (`multiple_choice`, `flashcard`, `open_ended`) and a
-  `difficulty` label. Used by the `deep-dive` collection.
+  `difficulty` label. Used by the `deep-dive` and `tooling` collections.
 
 Pick the API based on which collection you're authoring into.
 

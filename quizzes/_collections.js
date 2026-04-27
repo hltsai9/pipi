@@ -18,3 +18,9 @@ registerCollection({
   title: "Deep Dive",
   description: "Structured study sets — priming, comprehension, application, and synthesis — mixing flashcards, multiple choice, and open-ended reflection."
 });
+
+registerCollection({
+  key: "tooling",
+  title: "Tooling",
+  description: "Developer tooling — the day-to-day surface area of building with Claude and modern AI dev environments."
+});
