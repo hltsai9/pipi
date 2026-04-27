@@ -187,6 +187,7 @@ const state = {
   mcTotal: 0,
   answered: false,
   revealed: false,
+  answers: [],         // per-question history for back-navigation
   sortBy: "created",
   sortDir: "desc"
 };
@@ -316,6 +317,7 @@ function startQuiz(topicKey) {
   state.mcTotal = quiz.questions.filter((q) => q.type === "multiple_choice").length;
   state.answered = false;
   state.revealed = false;
+  state.answers = [];
   $("quiz-title").textContent = quiz.title;
   $("score").textContent = "0";
   showScreen("quiz");
@@ -331,8 +333,9 @@ function renderQuestion() {
   const quiz = getQuiz(state.currentTopic);
   const qIdx = state.currentIndex;
   const question = quiz.questions[qIdx];
-  state.answered = false;
-  state.revealed = false;
+  const prior = state.answers[qIdx];
+  state.answered = !!prior;
+  state.revealed = !!(prior && prior.revealed);
 
   $("progress-text").textContent = `Question ${qIdx + 1} of ${quiz.questions.length}`;
   $("progress-fill").style.width = `${(qIdx / quiz.questions.length) * 100}%`;
@@ -366,11 +369,45 @@ function renderQuestion() {
 
   if (question.type === "multiple_choice") {
     renderMultipleChoice(question);
+    if (prior) restoreMultipleChoice(question, prior);
   } else if (question.type === "flashcard") {
     renderFlashcard(question);
+    if (prior && prior.revealed) restoreFlashcardRevealed(question);
   } else if (question.type === "open_ended") {
     renderOpenEnded(question);
   }
+
+  setHidden($("back-btn"), qIdx === 0);
+}
+
+function restoreMultipleChoice(question, prior) {
+  const items = document.querySelectorAll("#choices .choice");
+  items.forEach((el, i) => {
+    el.classList.add("locked");
+    if (i === question.answer) el.classList.add("correct");
+    else if (i === prior.selectedIdx) el.classList.add("incorrect");
+    else el.classList.add("dimmed");
+  });
+  if (question.explanation) {
+    const explanation = $("explanation");
+    explanation.classList.add(prior.isCorrect ? "correct" : "incorrect");
+    $("explanation-title").textContent = prior.isCorrect ? "Correct!" : "Not quite.";
+    $("explanation-text").textContent = question.explanation;
+    setHidden(explanation, false);
+  }
+  showNextButton();
+}
+
+function restoreFlashcardRevealed(question) {
+  setHidden($("flashcard-back"), false);
+  setHidden($("reveal-btn"), true);
+  if (question.explanation) {
+    const explanation = $("explanation");
+    $("explanation-title").textContent = "Note";
+    $("explanation-text").textContent = question.explanation;
+    setHidden(explanation, false);
+  }
+  showNextButton();
 }
 
 function renderMultipleChoice(question) {
@@ -409,6 +446,7 @@ function selectChoice(idx) {
   const isCorrect = idx === correctIdx;
 
   if (isCorrect) state.score += 1;
+  state.answers[state.currentIndex] = { selectedIdx: idx, isCorrect };
   $("score").textContent = String(state.score);
 
   const items = document.querySelectorAll("#choices .choice");
@@ -433,6 +471,7 @@ function selectChoice(idx) {
 function revealFlashcard() {
   if (state.revealed) return;
   state.revealed = true;
+  state.answers[state.currentIndex] = { revealed: true };
   setHidden($("flashcard-back"), false);
   setHidden($("reveal-btn"), true);
 
@@ -445,6 +484,14 @@ function revealFlashcard() {
     setHidden(explanation, false);
   }
   showNextButton();
+}
+
+function goBack() {
+  if (state.currentIndex > 0) {
+    state.currentIndex -= 1;
+    renderQuestion();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
 }
 
 function showNextButton() {
@@ -503,6 +550,7 @@ function init() {
   $("retry-btn").addEventListener("click", () => startQuiz(state.currentTopic));
   $("next-btn").addEventListener("click", nextQuestion);
   $("reveal-btn").addEventListener("click", revealFlashcard);
+  $("back-btn").addEventListener("click", goBack);
 }
 
 document.addEventListener("DOMContentLoaded", init);

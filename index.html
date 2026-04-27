@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tech Quiz — LLMs, GPUs &amp; Deep Dives</title>
-  <link rel="stylesheet" href="styles.css?v=7" />
+  <link rel="stylesheet" href="styles.css?v=9" />
   <link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='12' fill='%236366f1'/><text x='50%' y='58%' text-anchor='middle' font-family='Arial' font-size='32' font-weight='bold' fill='white'>Q</text></svg>" />
 </head>
 <body>
@@ -65,8 +65,11 @@
           <p id="explanation-text"></p>
         </div>
         <div class="quiz-actions">
-          <button id="reveal-btn" class="btn ghost hidden">Reveal Answer</button>
-          <button id="next-btn" class="btn primary hidden">Next &rarr;</button>
+          <button id="back-btn" class="btn ghost hidden">&larr; Back</button>
+          <div class="quiz-actions-right">
+            <button id="reveal-btn" class="btn ghost hidden">Reveal Answer</button>
+            <button id="next-btn" class="btn primary hidden">Next &rarr;</button>
+          </div>
         </div>
       </article>
     </section>
@@ -106,7 +109,7 @@
          quizzes/_collections.js.
       2. Then add quiz files referencing that collection key.
   -->
-  <script defer src="app.js?v=7"></script>
+  <script defer src="app.js?v=9"></script>
 
   <!-- Quiz data -->
   <script defer src="quizzes/_collections.js?v=8"></script>
