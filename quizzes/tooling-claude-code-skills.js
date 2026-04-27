@@ -4,8 +4,8 @@ registerStructuredQuiz({
   title: "Claude Code Skills",
   icon: "S",
   description: "What skills are, how Claude Code loads them, and how to write a SKILL.md that actually fires.",
-  createdAt: "2026-04-26T21:00:00Z",
-  updatedAt: "2026-04-26T21:00:00Z",
+  createdAt: "2026-04-27T17:37:00Z",
+  updatedAt: "2026-04-27T17:37:00Z",
   sections: [
     {
       category: "priming",
