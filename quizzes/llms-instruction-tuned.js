@@ -5,7 +5,7 @@ registerQuiz({
   icon: "I",
   description: "Models fine-tuned to follow natural-language instructions.",
   createdAt: "2026-04-25T18:01:00Z",
-  updatedAt: "2026-04-26T17:50:00Z",
+  updatedAt: "2026-06-06T00:35:00Z",
   questions: [
     {
       q: "What is the main goal of instruction tuning?",
@@ -21,12 +21,12 @@ registerQuiz({
     {
       q: "Which of these is a well-known instruction-tuning dataset / approach?",
       choices: [
-        "GLUE — General Language Understanding Evaluation benchmark",
         "FLAN / Super-NaturalInstructions — collections of NLP tasks as prompts",
+        "GLUE — General Language Understanding Evaluation benchmark",
         "ImageNet — labeled image dataset for visual classification",
         "WMT Newstest — annual machine-translation evaluation set"
       ],
-      answer: 1,
+      answer: 0,
       explanation: "FLAN (Google) and Super-NaturalInstructions (AI2) collected hundreds to thousands of NLP tasks rephrased as natural-language instructions. Fine-tuning on them dramatically improved zero-shot generalization. The other options are evaluation/benchmark datasets, not instruction-tuning corpora."
     },
     {
@@ -54,12 +54,12 @@ registerQuiz({
     {
       q: "Which statement about instruction-tuned models is most accurate?",
       choices: [
-        "They no longer need a pretrained base model and are trained from scratch",
         "They generally generalize zero-shot to unseen instructions, but still hallucinate",
+        "They no longer need a pretrained base model and are trained from scratch",
         "They can only handle the specific tasks that appeared during fine-tuning",
         "They are guaranteed to be factually correct on any topic in their training data"
       ],
-      answer: 1,
+      answer: 0,
       explanation: "Instruction tuning gives strong zero-shot generalization to unseen tasks because the model learns the *format* of following instructions. But it does not fix factual reliability — instruction-tuned models still hallucinate, and they always start from a pretrained base."
     }
   ]

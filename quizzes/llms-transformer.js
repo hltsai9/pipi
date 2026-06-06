@@ -5,7 +5,7 @@ registerQuiz({
   icon: "T",
   description: "Self-attention, positional encodings, and the architecture behind modern LLMs.",
   createdAt: "2026-04-26T17:20:00Z",
-  updatedAt: "2026-04-26T17:50:00Z",
+  updatedAt: "2026-06-06T00:35:00Z",
   questions: [
     {
       q: "Which 2017 paper introduced the Transformer architecture?",
@@ -66,22 +66,22 @@ registerQuiz({
       q: "How do encoder-only, decoder-only, and encoder-decoder Transformers differ?",
       choices: [
         "They are implemented in different programming languages — Python vs. C++ vs. Rust",
-        "Encoder-only is bidirectional (BERT); decoder-only is causal (GPT); ED is seq-to-seq",
+        "Decoder-only Transformers do not use attention at all, relying purely on FFN blocks",
         "They differ only in the tokenizer used to map text into integer IDs at the input",
-        "Decoder-only Transformers do not use attention at all, relying purely on FFN blocks"
+        "Encoder-only is bidirectional (BERT); decoder-only is causal (GPT); ED is seq-to-seq"
       ],
-      answer: 1,
+      answer: 3,
       explanation: "The original Transformer was encoder-decoder for translation. BERT-style encoder-only models use bidirectional self-attention for understanding/classification. GPT-style decoder-only models use causal (masked) self-attention for autoregressive generation — and are now the dominant LLM design."
     },
     {
       q: "Why has the Transformer become the dominant architecture for large language models?",
       choices: [
         "It is the only architecture mathematically capable of representing language",
-        "Sequence-level parallelism, strong scaling behavior, and a uniform structure",
         "It uses essentially no learnable parameters and is therefore extremely cheap",
+        "Sequence-level parallelism, strong scaling behavior, and a uniform structure",
         "It cannot be trained on GPUs, forcing efficient algorithmic implementations"
       ],
-      answer: 1,
+      answer: 2,
       explanation: "Transformers parallelize beautifully on modern accelerators, their loss scales smoothly with model and data size (scaling laws), and the architecture is uniform — depth, width, and context length can all be increased almost mechanically. That combination of properties is what made modern LLMs possible."
     }
   ]

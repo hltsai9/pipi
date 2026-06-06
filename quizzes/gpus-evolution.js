@@ -5,39 +5,39 @@ registerQuiz({
   icon: "E",
   description: "From fixed-function graphics pipelines to programmable AI accelerators.",
   createdAt: "2026-04-25T18:32:00Z",
-  updatedAt: "2026-04-26T17:50:00Z",
+  updatedAt: "2026-06-06T00:35:00Z",
   questions: [
     {
       q: "What were early GPUs (late 1990s, e.g., NVIDIA RIVA / GeForce 256) primarily designed to do?",
       choices: [
-        "Train deep neural networks for image classification on consumer hardware",
         "Accelerate fixed-function 3D graphics — transform, lighting, and rasterization",
+        "Train deep neural networks for image classification on consumer hardware",
         "Mine cryptocurrencies such as Bitcoin and Ethereum at high hash rates",
         "Run general-purpose C code as a programmable parallel coprocessor for the CPU"
       ],
-      answer: 1,
+      answer: 0,
       explanation: "The original GPUs offloaded the fixed-function 3D graphics pipeline — vertex transform & lighting (T&L), rasterization, texture mapping — from the CPU. NVIDIA marketed the GeForce 256 (1999) as 'the world's first GPU' because it integrated T&L on the chip."
     },
     {
       q: "What major shift did programmable shaders (early 2000s, e.g., GeForce 3, DirectX 8) introduce?",
       choices: [
-        "GPUs gained their own full operating system separate from the host machine",
         "Vertex and pixel stages became programmable, running custom per-vertex/pixel code",
+        "GPUs gained their own full operating system separate from the host machine",
         "GPUs stopped supporting 3D graphics and pivoted to 2D-only desktop acceleration",
         "GPUs moved off the PCIe bus to dedicated point-to-point CPU interconnects"
       ],
-      answer: 1,
+      answer: 0,
       explanation: "Programmable vertex and pixel shaders replaced fixed-function stages with small programs. This is the foundation everything else built on — once you can run arbitrary code per-pixel, the GPU is on its way to becoming a general parallel processor."
     },
     {
       q: "Which 2006 release made GPUs broadly usable for general-purpose computation?",
       choices: [
-        "AMD's Radeon HD 2900 with its first unified shader rasterization pipeline",
         "NVIDIA's G80 / GeForce 8800 with the launch of the CUDA programming model",
+        "AMD's Radeon HD 2900 with its first unified shader rasterization pipeline",
         "Intel's Larrabee project, intended as a programmable many-core x86 accelerator",
         "Apple's Metal graphics and compute API for macOS and iOS application developers"
       ],
-      answer: 1,
+      answer: 0,
       explanation: "NVIDIA's G80 (2006) introduced a unified shader architecture and shipped alongside CUDA, a C-like programming model for general computation on the GPU. It turned GPUs from graphics-only chips into general parallel processors and kicked off the GPGPU era."
     },
     {
@@ -67,11 +67,11 @@ registerQuiz({
       q: "What does HBM (High-Bandwidth Memory) provide that GDDR does not, and why does it matter for AI GPUs?",
       choices: [
         "HBM is significantly cheaper per gigabyte than GDDR memory of the same generation",
-        "HBM uses stacked DRAM dies on a wide interface, giving far higher bandwidth (TB/s)",
         "HBM stores data persistently on disk so models survive across reboots and crashes",
+        "HBM uses stacked DRAM dies on a wide interface, giving far higher bandwidth (TB/s)",
         "HBM is a non-volatile memory technology that retains data without any power supplied"
       ],
-      answer: 1,
+      answer: 2,
       explanation: "HBM places stacked DRAM next to the GPU on a silicon interposer, with a much wider interface than GDDR. The result is dramatically higher bandwidth (TB/s), at higher cost. Datacenter AI GPUs (P100/V100/A100/H100/B200, MI200/MI300) all use HBM because DL is bandwidth-hungry."
     },
     {
@@ -89,11 +89,11 @@ registerQuiz({
       q: "Which trend has most defined GPU evolution since ~2017?",
       choices: [
         "A general return to fixed-function graphics-only pipelines reminiscent of the 1990s",
-        "Specialization for AI: tensor cores, low-precision formats (FP8/BF16), HBM, NVLink",
+        "Migrating off PCIe and onto USB-style serial interconnects between hosts and GPUs",
         "Dropping floating-point support entirely in favor of pure integer-only datapaths",
-        "Migrating off PCIe and onto USB-style serial interconnects between hosts and GPUs"
+        "Specialization for AI: tensor cores, low-precision formats (FP8/BF16), HBM, NVLink"
       ],
-      answer: 1,
+      answer: 3,
       explanation: "Modern GPU roadmaps are increasingly shaped by AI workloads: tensor/matrix engines, ever-lower precision (FP16 → BF16 → FP8 → FP4), HBM stacks for bandwidth, NVLink/NVSwitch for tight multi-GPU coupling, and rack-scale systems (DGX/HGX, GB200 NVL72) optimized for training and serving large models."
     }
   ]

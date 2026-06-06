@@ -5,7 +5,7 @@ registerQuiz({
   icon: "E",
   description: "From n-grams and word embeddings to transformers and modern frontier models.",
   createdAt: "2026-04-25T18:04:00Z",
-  updatedAt: "2026-04-26T17:50:00Z",
+  updatedAt: "2026-06-06T00:35:00Z",
   questions: [
     {
       q: "Which 2017 paper introduced the architecture that underpins essentially all modern large language models?",
@@ -32,12 +32,12 @@ registerQuiz({
     {
       q: "What was the key insight of BERT (2018) versus prior approaches?",
       choices: [
-        "Replacing the Transformer encoder with stacks of LSTMs for richer context",
         "Bidirectional masked-LM pretraining followed by per-task fine-tuning",
+        "Replacing the Transformer encoder with stacks of LSTMs for richer context",
         "Using a strict left-to-right autoregressive objective for every task",
         "Training only on labeled task data, with no large unsupervised pretraining"
       ],
-      answer: 1,
+      answer: 0,
       explanation: "BERT pretrained a Transformer encoder with masked language modeling (predict missing tokens using both left and right context) plus next-sentence prediction, then fine-tuned a small head per task. It set new SOTA across NLP and popularized the 'pretrain + fine-tune' paradigm."
     },
     {
@@ -76,12 +76,12 @@ registerQuiz({
     {
       q: "Which trend characterizes frontier LLMs from ~2023 onward?",
       choices: [
-        "A general return to recurrent neural networks for long-range modeling",
         "Multimodality, long contexts, tool use, and explicit reasoning models",
+        "A general return to recurrent neural networks for long-range modeling",
         "Abandoning transformers entirely in favor of symbolic AI systems",
         "Pure unsupervised pretraining only, with no post-training of any kind"
       ],
-      answer: 1,
+      answer: 0,
       explanation: "Recent frontier LLMs (GPT-4o, Claude 3/4, Gemini, Llama 3+) extend the transformer recipe with multimodal inputs/outputs, much longer context (100K–1M+ tokens), native tool/function calling, and explicit 'thinking' / reasoning modes. The transformer backbone has stayed; the surrounding capabilities have exploded."
     }
   ]

@@ -5,28 +5,28 @@ registerQuiz({
   icon: "C",
   description: "Latency vs. throughput, control flow vs. data parallelism.",
   createdAt: "2026-04-25T18:31:00Z",
-  updatedAt: "2026-04-26T17:50:00Z",
+  updatedAt: "2026-06-06T00:35:00Z",
   questions: [
     {
       q: "Which one-line summary best captures the architectural difference between CPUs and GPUs?",
       choices: [
-        "CPUs use analog electronics, while GPUs are fully digital integrated circuits",
         "CPUs are latency-optimized with few powerful cores; GPUs are throughput-optimized",
+        "CPUs use analog electronics, while GPUs are fully digital integrated circuits",
         "GPUs run graphics workloads exclusively; CPUs are the only path to general code",
         "CPUs operate on 64-bit data while GPUs are limited to 32-bit math by hardware"
       ],
-      answer: 1,
+      answer: 0,
       explanation: "A CPU dedicates lots of transistors to making a single thread fast: deep pipelines, big caches, branch prediction, out-of-order execution. A GPU dedicates transistors to running thousands of simpler threads in parallel — sacrificing single-thread latency for aggregate throughput."
     },
     {
       q: "Which feature is far more developed on a CPU than on a GPU?",
       choices: [
         "Aggregate floating-point throughput across the entire chip's compute units",
-        "Sophisticated per-core branch prediction and out-of-order execution logic",
         "Wide SIMD-style execution across thousands of independent vector lanes",
+        "Sophisticated per-core branch prediction and out-of-order execution logic",
         "On-package high-bandwidth memory (HBM) stacked next to the compute die"
       ],
-      answer: 1,
+      answer: 2,
       explanation: "CPUs put enormous die area into making sequential code fast: branch predictors, large reorder buffers, speculative execution, deep cache hierarchies. GPUs largely skip this complexity per core and instead hide latency by switching to other ready warps."
     },
     {
@@ -44,11 +44,11 @@ registerQuiz({
       q: "How do CPUs and GPUs differ in how they hide memory latency?",
       choices: [
         "Neither architecture treats memory latency as a real concern in modern designs",
-        "CPUs use deep caches and out-of-order execution; GPUs swap to other warps",
+        "Both architectures rely exclusively on hardware prefetchers and nothing else",
         "GPUs avoid caches entirely and rely only on per-thread register files",
-        "Both architectures rely exclusively on hardware prefetchers and nothing else"
+        "CPUs use deep caches and out-of-order execution; GPUs swap to other warps"
       ],
-      answer: 1,
+      answer: 3,
       explanation: "The CPU strategy is to keep one thread fast: deep caches, prefetching, OOO. The GPU strategy is the opposite: when a warp stalls on memory, the SM instantly switches to another ready warp. With thousands of in-flight threads, latency is amortized across them."
     },
     {
