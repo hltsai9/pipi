@@ -5,7 +5,7 @@ registerQuiz({
   icon: "G",
   description: "Foundation models trained on broad text to predict the next token.",
   createdAt: "2026-04-25T18:00:00Z",
-  updatedAt: "2026-04-26T17:50:00Z",
+  updatedAt: "2026-06-06T00:35:00Z",
   questions: [
     {
       q: "What is the core training objective of a generic (pretrained) large language model?",
@@ -21,12 +21,12 @@ registerQuiz({
     {
       q: "Why are generic LLMs sometimes called 'foundation models'?",
       choices: [
-        "They run only on a foundational class of dedicated AI accelerator hardware",
-        "They were the first language models ever built and are kept for legacy reasons",
         "They serve as a general-purpose base that can be adapted to many downstream tasks",
+        "They were the first language models ever built and are kept for legacy reasons",
+        "They run only on a foundational class of dedicated AI accelerator hardware",
         "They are constrained to a single foundational task such as machine translation"
       ],
-      answer: 2,
+      answer: 0,
       explanation: "Coined by Stanford's CRFM in 2021, 'foundation model' captures the idea that one large pretrained model serves as a base that can be fine-tuned, prompted, or adapted to a wide variety of tasks — rather than training a separate model from scratch for each task."
     },
     {
@@ -34,10 +34,10 @@ registerQuiz({
       choices: [
         "It refuses because it has not been authorized to answer factual questions",
         "It produces 'Paris.' as cleanly as an instruction-tuned chat model would",
-        "It often continues the text — e.g., generating more questions in the same style",
-        "It returns an explicit error because the prompt does not match its expected format"
+        "It returns an explicit error because the prompt does not match its expected format",
+        "It often continues the text — e.g., generating more questions in the same style"
       ],
-      answer: 2,
+      answer: 3,
       explanation: "A pure pretrained LLM is just a text continuator. Without instruction tuning, it has no special bias to 'follow' a question — it predicts what text typically follows. Often this means continuing in the same style, e.g., listing more trivia questions, rather than answering directly."
     },
     {

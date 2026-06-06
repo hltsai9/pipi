@@ -5,7 +5,7 @@ registerQuiz({
   icon: "S",
   description: "Models specialized for medicine, law, code, finance, and more.",
   createdAt: "2026-04-25T18:03:00Z",
-  updatedAt: "2026-04-26T17:50:00Z",
+  updatedAt: "2026-06-06T00:35:00Z",
   questions: [
     {
       q: "Which of these is an example of a domain-specific LLM?",
@@ -21,12 +21,12 @@ registerQuiz({
     {
       q: "What are the two most common ways to build a domain-specific LLM?",
       choices: [
-        "Increasing sampling temperature and top-p so outputs sound more domain-like",
-        "Aggressively quantizing the weights to int4 to specialize on smaller hardware",
         "Continued pretraining or fine-tuning on domain text, or retrieval-augmented generation",
+        "Aggressively quantizing the weights to int4 to specialize on smaller hardware",
+        "Increasing sampling temperature and top-p so outputs sound more domain-like",
         "Replacing the tokenizer with simple whitespace splitting tuned to domain syntax"
       ],
-      answer: 2,
+      answer: 0,
       explanation: "You either bake domain knowledge into the weights — by continued pretraining or fine-tuning on domain corpora — or you keep a generic model and supply domain knowledge at inference time via retrieval (RAG). In practice, hybrid approaches (fine-tune + RAG) are common."
     },
     {
@@ -45,10 +45,10 @@ registerQuiz({
       choices: [
         "Medicine and clinical text",
         "Legal contracts and case law",
-        "Source code and programming",
-        "Finance and trading research"
+        "Finance and trading research",
+        "Source code and programming"
       ],
-      answer: 2,
+      answer: 3,
       explanation: "These are code-specialized LLMs, typically pretrained or continue-pretrained on large public code corpora (e.g., The Stack, GitHub). Code is one of the clearest success stories for domain specialization — code-tuned models handily beat general models at programming tasks of similar size."
     },
     {

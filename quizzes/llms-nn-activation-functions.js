@@ -5,17 +5,17 @@ registerQuiz({
   icon: "σ",
   description: "Nonlinearities — ReLU, sigmoid, tanh, GELU, softmax — and why they matter.",
   createdAt: "2026-04-25T19:00:00Z",
-  updatedAt: "2026-04-26T17:50:00Z",
+  updatedAt: "2026-06-06T00:35:00Z",
   questions: [
     {
       q: "What is the primary purpose of using a nonlinear activation function in a neural network?",
       choices: [
         "To speed up matrix multiplication on modern GPU hardware accelerators",
-        "To act as a regularizer that prevents the network from overfitting the data",
         "To allow the model to express nonlinear relationships, which stacked linear layers cannot",
+        "To act as a regularizer that prevents the network from overfitting the data",
         "To reduce the parameter count by sharing weights across the activation function"
       ],
-      answer: 2,
+      answer: 1,
       explanation: "A composition of linear functions is itself linear, so without a nonlinear activation between layers, a deep network has no more representational power than a single linear layer. Nonlinearities (ReLU, sigmoid, GELU, etc.) are what let neural networks approximate arbitrary functions."
     },
     {
@@ -44,11 +44,11 @@ registerQuiz({
       q: "Which activation is most commonly used inside transformer feed-forward layers in modern LLMs?",
       choices: [
         "Plain sigmoid, applied element-wise after each linear projection",
-        "Tanh, since it is centered at zero and has a bounded range",
         "GELU and its gated variants such as SwiGLU and GeGLU",
+        "Tanh, since it is centered at zero and has a bounded range",
         "Softmax, applied across the feature dimension of the FFN output"
       ],
-      answer: 2,
+      answer: 1,
       explanation: "GELU (Gaussian Error Linear Unit) and gated variants like SwiGLU have become the default in transformer FFN blocks (BERT, GPT, Llama, etc.). They're smooth ReLU-like nonlinearities that empirically train slightly better. softmax is used for attention weights and classification outputs, not as the FFN nonlinearity."
     },
     {

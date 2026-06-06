@@ -5,17 +5,17 @@ registerQuiz({
   icon: "A",
   description: "Cores, warps, memory hierarchy, and the SIMT execution model.",
   createdAt: "2026-04-25T18:30:00Z",
-  updatedAt: "2026-04-26T17:50:00Z",
+  updatedAt: "2026-06-06T00:35:00Z",
   questions: [
     {
       q: "Which execution model best describes how modern NVIDIA GPUs run code?",
       choices: [
-        "MIMD — every core fetches a different instruction independently each cycle",
         "SIMT — groups of threads execute the same instruction in lock-step warps",
+        "MIMD — every core fetches a different instruction independently each cycle",
         "Pure scalar — one instruction per thread per cycle, fully independent control",
         "Dataflow — instructions fire whenever all of their input operands become ready"
       ],
-      answer: 1,
+      answer: 0,
       explanation: "NVIDIA calls its model SIMT (Single Instruction, Multiple Threads). Threads are grouped into warps of 32 that share an instruction pointer; if threads in a warp take different branches, the warp serializes them (warp divergence). It's a generalization of classic SIMD."
     },
     {
@@ -39,11 +39,11 @@ registerQuiz({
       q: "What is a Streaming Multiprocessor (SM) on an NVIDIA GPU?",
       choices: [
         "The PCIe interconnect block that handles host-device DMA over the bus",
-        "A scheduler block bundling CUDA cores, warp schedulers, registers, and shared memory",
+        "An on-chip cache that simply mirrors a slice of global memory and nothing else",
         "The video output engine that drives display connectors and frame buffers",
-        "An on-chip cache that simply mirrors a slice of global memory and nothing else"
+        "A scheduler block bundling CUDA cores, warp schedulers, registers, and shared memory"
       ],
-      answer: 1,
+      answer: 3,
       explanation: "An SM is the GPU's basic compute building block. It bundles execution units (CUDA cores, tensor cores, special-function units), warp schedulers, a register file, and shared memory / L1. A modern GPU has dozens to over a hundred SMs working in parallel."
     },
     {
@@ -71,12 +71,12 @@ registerQuiz({
     {
       q: "Why does GPU memory bandwidth (e.g., HBM3) matter so much for deep-learning workloads?",
       choices: [
-        "Because deep-learning training runs entirely from spinning disk during the epoch",
         "Many DL kernels are bandwidth-bound — feeding tensor cores demands huge HBM throughput",
+        "Because deep-learning training runs entirely from spinning disk during the epoch",
         "Because GPUs lack any kind of on-chip cache and must hit DRAM on every access",
         "Because PCIe bandwidth is effectively unlimited, making HBM bandwidth irrelevant"
       ],
-      answer: 1,
+      answer: 0,
       explanation: "Modern accelerators have so much compute that many real workloads are limited by how fast data can be moved into the chip — not by FLOPs. HBM (High-Bandwidth Memory) stacks DRAM dies next to the GPU die over a wide interface, delivering TB/s of bandwidth that GDDR can't match."
     }
   ]

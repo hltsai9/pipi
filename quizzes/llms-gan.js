@@ -5,7 +5,7 @@ registerQuiz({
   icon: "G",
   description: "A generator vs. a discriminator — adversarial training for synthesis.",
   createdAt: "2026-04-26T17:21:00Z",
-  updatedAt: "2026-04-26T17:50:00Z",
+  updatedAt: "2026-06-06T00:35:00Z",
   questions: [
     {
       q: "Who introduced Generative Adversarial Networks, and when?",
@@ -22,11 +22,11 @@ registerQuiz({
       q: "Which two networks make up a GAN?",
       choices: [
         "An encoder that compresses data and a decoder that reconstructs it",
-        "A generator that maps noise to samples and a discriminator that judges them",
+        "A policy network selecting actions and a value network estimating returns",
         "A teacher network producing soft targets and a student network mimicking them",
-        "A policy network selecting actions and a value network estimating returns"
+        "A generator that maps noise to samples and a discriminator that judges them"
       ],
-      answer: 1,
+      answer: 3,
       explanation: "A GAN pairs a generator (maps a random noise vector z to a sample, e.g., an image) with a discriminator (binary classifier: real vs. generated). They train against each other: the generator tries to fool the discriminator, the discriminator tries not to be fooled."
     },
     {
@@ -77,11 +77,11 @@ registerQuiz({
       q: "How do GANs compare to diffusion models, which now dominate state-of-the-art image generation?",
       choices: [
         "Diffusion models are a special case of GANs with extra adversarial losses added",
-        "Diffusion is more stable and diverse but slower at inference than a single GAN pass",
+        "Diffusion models require no training data, only random noise samples and priors",
         "GANs are strictly better than diffusion models on every quality and speed metric",
-        "Diffusion models require no training data, only random noise samples and priors"
+        "Diffusion is more stable and diverse but slower at inference than a single GAN pass"
       ],
-      answer: 1,
+      answer: 3,
       explanation: "Diffusion models (DDPM, Stable Diffusion, Imagen, DALL·E 2/3) learn to reverse a noise process step by step. They tend to be more stable to train and cover the data distribution better than GANs (less mode collapse), at the cost of multi-step iterative inference. State-of-the-art image generation has largely shifted from GANs to diffusion since ~2020–2022."
     }
   ]
