@@ -208,6 +208,20 @@ function formatDate(ms) {
   });
 }
 
+function getPracticeEntry(collectionKey, topicKey) {
+  const log = window.__practiceLog || {};
+  return log[`${collectionKey}/${topicKey}`] || null;
+}
+
+function formatSession(session) {
+  if (!session || !session.date) return "";
+  const d = new Date(`${session.date}T${session.time || "00:00"}`);
+  const datePart = Number.isNaN(d.getTime())
+    ? session.date
+    : d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+  return session.time ? `${datePart}, ${session.time}` : datePart;
+}
+
 function sortKey(topic) {
   return state.sortBy === "updated" ? topic.updatedAt : topic.createdAt;
 }
@@ -293,6 +307,7 @@ function renderTopics() {
       <h3></h3>
       <p></p>
       <span class="topic-count"></span>
+      <span class="topic-practice"></span>
       <div class="topic-meta">
         <span><span class="topic-meta-label">Created</span> <span class="topic-meta-date" data-field="created"></span></span>
         <span><span class="topic-meta-label">Updated</span> <span class="topic-meta-date" data-field="updated"></span></span>
@@ -302,6 +317,17 @@ function renderTopics() {
     card.querySelector("h3").textContent = quiz.title;
     card.querySelector("p").textContent = quiz.description;
     card.querySelector(".topic-count").textContent = `${quiz.questions.length} questions`;
+    const practice = getPracticeEntry(collection.key, key);
+    const practiceEl = card.querySelector(".topic-practice");
+    if (practice && practice.count > 0) {
+      const sessions = practice.sessions || [];
+      const last = sessions.length ? sessions[sessions.length - 1] : null;
+      const lastStr = last ? ` · last ${formatSession(last)}` : "";
+      practiceEl.textContent = `Practiced ${practice.count}×${lastStr}`;
+    } else {
+      practiceEl.textContent = "Not practiced yet";
+      practiceEl.classList.add("muted-practice");
+    }
     card.querySelector('[data-field="created"]').textContent = formatDate(quiz.createdAt);
     card.querySelector('[data-field="updated"]').textContent = formatDate(quiz.updatedAt);
     card.addEventListener("click", () => startQuiz(key));
