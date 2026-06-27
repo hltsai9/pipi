@@ -16,4 +16,10 @@
  * `count` always equals sessions.length. Times use 24-hour "HH:MM".
  */
 window.__practiceLog = {
+  "kubernetes/cluster-architecture": {
+    count: 1,
+    sessions: [
+      { date: "2026-06-27", time: "11:00" }
+    ]
+  }
 };
