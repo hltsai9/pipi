@@ -72,6 +72,13 @@ Edit `quizzes/_practice-log.js`:
   `sessions` array.
 - Keep the object valid JS and keep `count === sessions.length`.
 
+Then bump the cache-busting version on the practice-log script tag in
+`index.html` so browsers refetch the updated data instead of serving a
+stale cached copy. Find the line
+`<script defer src="quizzes/_practice-log.js?v=N"></script>` and increment
+`N` by one. (Without this, a normal refresh keeps showing the old count —
+only a hard refresh would pick up the change.)
+
 ### 4. Verify
 
 Run `node quizzes/.audit.js` and confirm it still reports no errors (the
@@ -84,7 +91,7 @@ practice log must not break the bundle). Then sanity-check the file parses:
 Per this project's branch rules, persist the change (the environment is
 ephemeral, so an uncommitted log would be lost):
 
-- Stage only `quizzes/_practice-log.js`.
+- Stage only `quizzes/_practice-log.js` and `index.html` (the version bump).
 - Commit with a message like
   `Log practice session for <collection>/<key> (<date> <time>)`.
 - Push to the designated feature branch with `git push -u origin <branch>`.
