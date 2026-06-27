@@ -24,3 +24,9 @@ registerCollection({
   title: "Tooling",
   description: "Developer tooling — the day-to-day surface area of building with Claude and modern AI dev environments."
 });
+
+registerCollection({
+  key: "kubernetes",
+  title: "Kubernetes",
+  description: "How a Kubernetes cluster is built — the control plane, the worker nodes, and the components that keep your workloads running."
+});
