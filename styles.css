@@ -236,6 +236,18 @@ main {
   padding: 4px 10px;
   border-radius: 999px;
 }
+.topic-card .topic-practice {
+  display: block;
+  margin-top: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+}
+.topic-card .topic-practice.muted-practice {
+  font-weight: 500;
+  color: var(--text-muted);
+  opacity: 0.85;
+}
 .topic-card .topic-meta {
   display: flex;
   flex-direction: column;
