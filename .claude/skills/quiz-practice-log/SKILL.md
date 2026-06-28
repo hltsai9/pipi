@@ -41,12 +41,19 @@ Extract three things from what the user said:
 
 - **Which quiz** — a title or partial name (e.g. "kubernetes architecture",
   "Pods", "self attention").
-- **The date** — resolve relative words against today. Run `date +%Y-%m-%d`
-  for "today", and compute "yesterday"/explicit dates from it. Never guess
-  today's date — always read it from the system.
+  The user is in **Phoenix, Arizona** (timezone `America/Phoenix`, MST /
+  UTC−7, no daylight saving). The container clock is UTC, so always read the
+  date and time in the user's timezone with `TZ='America/Phoenix'`, never the
+  raw UTC clock.
+
+- **The date** — resolve relative words against today *in Phoenix*. Run
+  `TZ='America/Phoenix' date +%Y-%m-%d` for "today", and compute
+  "yesterday"/explicit dates from it. Never guess the date — always read it
+  from the system in that timezone.
 - **The time** — normalize to 24-hour `HH:MM`. "11am" → `11:00`,
   "11:30pm" → `23:30`, "noon" → `12:00`. If the user gives no time, use the
-  current time from `date +%H:%M`, and mention that you did so.
+  current Phoenix time from `TZ='America/Phoenix' date +%H:%M`, and mention
+  that you did so.
 
 ### 2. Identify the quiz
 
