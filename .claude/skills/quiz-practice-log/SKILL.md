@@ -95,7 +95,14 @@ ephemeral, so an uncommitted log would be lost):
 - Commit with a message like
   `Log practice session for <collection>/<key> (<date> <time>)`.
 - Push to the designated feature branch with `git push -u origin <branch>`.
-- Do not open a PR.
+
+Then publish it so the count shows on the live (GitHub Pages) site, which
+serves from `main`: open a pull request from the feature branch into `main`
+and merge it immediately (practice-log entries are pre-approved by the user
+for auto-merge — no need to ask first). Use the GitHub MCP tools
+(`create_pull_request` then `merge_pull_request`). If a PR for the branch
+already exists, just merge that one. This auto-merge applies only to
+practice-log updates; other changes still follow the normal review flow.
 
 ### 6. Report back
 
