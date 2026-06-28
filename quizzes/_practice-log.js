@@ -21,5 +21,11 @@ window.__practiceLog = {
     sessions: [
       { date: "2026-06-27", time: "11:00" }
     ]
+  },
+  "kubernetes/pods": {
+    count: 1,
+    sessions: [
+      { date: "2026-06-28", time: "09:48" }
+    ]
   }
 };
