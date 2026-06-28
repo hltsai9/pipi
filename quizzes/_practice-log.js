@@ -27,5 +27,11 @@ window.__practiceLog = {
     sessions: [
       { date: "2026-06-28", time: "09:48" }
     ]
+  },
+  "kubernetes/deployments": {
+    count: 1,
+    sessions: [
+      { date: "2026-06-28", time: "17:48" }
+    ]
   }
 };
