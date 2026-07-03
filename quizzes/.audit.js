@@ -34,9 +34,9 @@ vm.createContext(sandbox);
 
 const files = [
   path.join(ROOT, "app.js"),
-  path.join(ROOT, "quizzes/_collections.js"),
+  path.join(ROOT, "quizzes/data-collections.js"),
   ...fs.readdirSync(path.join(ROOT, "quizzes"))
-    .filter(f => f.endsWith(".js") && f !== "_collections.js" && !f.startsWith("."))
+    .filter(f => f.endsWith(".js") && f !== "data-collections.js" && !f.startsWith("."))
     .map(f => path.join(ROOT, "quizzes", f))
 ];
 
