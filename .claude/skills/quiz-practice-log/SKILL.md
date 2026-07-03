@@ -6,12 +6,12 @@ description: Record a quiz practice session for this project's quiz site. Use wh
 # Quiz Practice Log
 
 Records how many times the user has practiced each quiz, plus the date and
-time of every session. The data lives in `quizzes/_practice-log.js` and is
+time of every session. The data lives in `quizzes/data-practice-log.js` and is
 shown on each topic card by the site engine (`app.js`).
 
 ## Data format
 
-`quizzes/_practice-log.js` sets one global object, keyed by
+`quizzes/data-practice-log.js` sets one global object, keyed by
 `"<collection>/<topic-key>"`:
 
 ```js
@@ -59,7 +59,7 @@ Extract three things from what the user said:
 
 List the available quizzes by reading the `collection` and `key` (and
 `title`) fields from the files in `quizzes/` (each `*.js` quiz file calls
-`registerQuiz`/`registerStructuredQuiz` with those fields; `_collections.js`
+`registerQuiz`/`registerStructuredQuiz` with those fields; `data-collections.js`
 lists collection keys/titles). Match the user's phrase against title and key,
 case-insensitively, allowing partial matches.
 
@@ -71,7 +71,7 @@ case-insensitively, allowing partial matches.
 
 ### 3. Update the log
 
-Edit `quizzes/_practice-log.js`:
+Edit `quizzes/data-practice-log.js`:
 
 - If the `"<collection>/<topic-key>"` entry exists, append the new
   `{ date, time }` to its `sessions` array and increment `count`.
@@ -82,7 +82,7 @@ Edit `quizzes/_practice-log.js`:
 Then bump the cache-busting version on the practice-log script tag in
 `index.html` so browsers refetch the updated data instead of serving a
 stale cached copy. Find the line
-`<script defer src="quizzes/_practice-log.js?v=N"></script>` and increment
+`<script defer src="quizzes/data-practice-log.js?v=N"></script>` and increment
 `N` by one. (Without this, a normal refresh keeps showing the old count —
 only a hard refresh would pick up the change.)
 
@@ -90,7 +90,7 @@ only a hard refresh would pick up the change.)
 
 Run `node quizzes/.audit.js` and confirm it still reports no errors (the
 practice log must not break the bundle). Then sanity-check the file parses:
-`node -e "require('./quizzes/_practice-log.js')"` will fail because it uses
+`node -e "require('./quizzes/data-practice-log.js')"` will fail because it uses
 `window`, so instead just confirm the audit passed.
 
 ### 5. Commit and push
@@ -98,7 +98,7 @@ practice log must not break the bundle). Then sanity-check the file parses:
 Per this project's branch rules, persist the change (the environment is
 ephemeral, so an uncommitted log would be lost):
 
-- Stage only `quizzes/_practice-log.js` and `index.html` (the version bump).
+- Stage only `quizzes/data-practice-log.js` and `index.html` (the version bump).
 - Commit with a message like
   `Log practice session for <collection>/<key> (<date> <time>)`.
 - Push to the designated feature branch with `git push -u origin <branch>`.

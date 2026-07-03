@@ -6,7 +6,7 @@ description: Author quiz content for this project's quiz site under quizzes/ —
 # Quiz Author
 
 The site lives at the repo root: `index.html`, `app.js`, `styles.css`, and a
-`quizzes/` folder holding one file per topic plus `_collections.js`. Topics
+`quizzes/` folder holding one file per topic plus `data-collections.js`. Topics
 self-register; collections via `registerCollection({...})`.
 
 There are two registration APIs:
@@ -100,7 +100,7 @@ A 5-question topic should have at least 3 of these flavors.
 
 ### A1. Pick a collection
 
-Read `quizzes/_collections.js` and skim the topic titles already in each
+Read `quizzes/data-collections.js` and skim the topic titles already in each
 collection. Propose the best fit to the user with a one-line rationale.
 If two are plausible, ask. If none fit, switch to flow B.
 
@@ -206,7 +206,7 @@ Run `node quizzes/.audit.js`. Re-author until 0 errors.
 ## B. Add a collection
 
 1. Add a `registerCollection({key, title, description})` call to
-   `quizzes/_collections.js`.
+   `quizzes/data-collections.js`.
 2. Suggest 2–3 starter topics for the collection and run flow A for each.
 3. Verify with `node quizzes/.audit.js`.
 

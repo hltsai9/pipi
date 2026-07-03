@@ -52,7 +52,7 @@
  *       });
  *
  *  Add the file to index.html with <script defer src="..."></script>.
- *  Collections are declared in quizzes/_collections.js.
+ *  Collections are declared in quizzes/data-collections.js.
  * ──────────────────────────────────────────────────────────────────────
  */
 
