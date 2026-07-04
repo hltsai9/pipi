@@ -40,5 +40,11 @@ window.__practiceLog = {
     sessions: [
       { date: "2026-07-04", time: "11:00" }
     ]
+  },
+  "kubernetes/stateful-applications": {
+    count: 1,
+    sessions: [
+      { date: "2026-07-04", time: "12:08" }
+    ]
   }
 };
