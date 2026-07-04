@@ -29,9 +29,16 @@ window.__practiceLog = {
     ]
   },
   "kubernetes/deployments": {
+    count: 2,
+    sessions: [
+      { date: "2026-06-28", time: "10:49" },
+      { date: "2026-07-04", time: "11:00" }
+    ]
+  },
+  "kubernetes/statefulsets": {
     count: 1,
     sessions: [
-      { date: "2026-06-28", time: "10:49" }
+      { date: "2026-07-04", time: "11:00" }
     ]
   }
 };
