@@ -30,3 +30,9 @@ registerCollection({
   title: "Kubernetes",
   description: "How a Kubernetes cluster is built — the control plane, the worker nodes, and the components that keep your workloads running."
 });
+
+registerCollection({
+  key: "headroom",
+  title: "Headroom",
+  description: "Netflix's context-optimization layer for LLM apps — compress tool outputs, files, and RAG results before they reach the model, reversibly."
+});
