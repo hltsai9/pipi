@@ -58,5 +58,11 @@ window.__practiceLog = {
     sessions: [
       { date: "2026-07-11", time: "12:25" }
     ]
+  },
+  "headroom/how-compression-works": {
+    count: 1,
+    sessions: [
+      { date: "2026-07-12", time: "09:21" }
+    ]
   }
 };

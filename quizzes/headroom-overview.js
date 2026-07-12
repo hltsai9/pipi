@@ -4,8 +4,8 @@ registerStructuredQuiz({
   title: "Overview",
   icon: "H",
   description: "What Headroom is, the problem it solves, and where it fits.",
-  createdAt: "2026-07-04T13:00:00Z",
-  updatedAt: "2026-07-04T13:00:00Z",
+  createdAt: "2026-07-09T13:00:00Z",
+  updatedAt: "2026-07-09T13:00:00Z",
   sections: [
     {
       category: "priming",
