@@ -59,9 +59,16 @@ audit script enforces them.
 6. **Explanations.** Always present, naming the correct concept and briefly
    addressing why a tempting wrong answer is wrong.
 
-7. **Use today's actual date.** Set `createdAt` (and `updatedAt` on
-   creation) to today's ISO 8601 timestamp. If unsure, run `date -u`
-   before writing the file — never guess.
+7. **Use today's actual date — always read it from the system, never
+   type a date from memory.** This is mandatory, not "if unsure": BEFORE
+   writing or editing any quiz file, run
+   `TZ='America/Phoenix' date +%Y-%m-%dT%H:%M:%SZ` (the user is in Phoenix,
+   Arizona) and use that value for `createdAt` and `updatedAt` on creation.
+   Do not copy a date from another file, an earlier step, or the
+   conversation — those are how a stale date sneaks in. When you only edit
+   an existing quiz, leave `createdAt` alone and set `updatedAt` to the
+   freshly-read date. If you cannot run `date`, stop and ask rather than
+   guessing.
 
 ### Worked example
 
@@ -219,7 +226,9 @@ correct answer is always at one position, etc.
 2. For each question, identify which design rule it violates and rewrite
    the choices accordingly. Keep the question stem and explanation intact
    unless the explanation references a specific (now-changed) wording.
-3. Bump `updatedAt` to today's ISO 8601 timestamp.
+3. Bump `updatedAt` to today's date read from the system (see rule 7 —
+   run `TZ='America/Phoenix' date +%Y-%m-%dT%H:%M:%SZ`; never type it from
+   memory). Leave `createdAt` unchanged.
 4. Bump the file's `?v=` query string in `index.html`.
 5. Verify with `node quizzes/.audit.js`.
 
