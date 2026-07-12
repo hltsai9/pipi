@@ -42,9 +42,10 @@ window.__practiceLog = {
     ]
   },
   "kubernetes/stateful-applications": {
-    count: 1,
+    count: 2,
     sessions: [
-      { date: "2026-07-04", time: "12:08" }
+      { date: "2026-07-04", time: "12:08" },
+      { date: "2026-07-12", time: "11:18" }
     ]
   },
   "headroom/overview": {
