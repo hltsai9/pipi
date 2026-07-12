@@ -64,5 +64,11 @@ window.__practiceLog = {
     sessions: [
       { date: "2026-07-12", time: "09:21" }
     ]
+  },
+  "headroom/cache-optimization": {
+    count: 1,
+    sessions: [
+      { date: "2026-07-12", time: "10:25" }
+    ]
   }
 };
