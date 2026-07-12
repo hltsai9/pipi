@@ -4,8 +4,8 @@ registerStructuredQuiz({
   title: "Setup, Config & Limits",
   icon: "S",
   description: "Installing and running Headroom, configuring it, hot-reload, and the safety gates that limit compression.",
-  createdAt: "2026-07-04T13:20:00Z",
-  updatedAt: "2026-07-04T13:20:00Z",
+  createdAt: "2026-07-09T13:20:00Z",
+  updatedAt: "2026-07-09T13:20:00Z",
   sections: [
     {
       category: "priming",

@@ -4,8 +4,8 @@ registerStructuredQuiz({
   title: "Cache Optimization",
   icon: "K",
   description: "CacheAligner, the live zone, and preserving the provider's KV-cache prefix discount.",
-  createdAt: "2026-07-04T13:15:00Z",
-  updatedAt: "2026-07-04T13:15:00Z",
+  createdAt: "2026-07-09T13:15:00Z",
+  updatedAt: "2026-07-09T13:15:00Z",
   sections: [
     {
       category: "priming",

@@ -4,8 +4,8 @@ registerStructuredQuiz({
   title: "Architecture & CCR",
   icon: "C",
   description: "Compress-Cache-Retrieve, hash markers, the headroom_retrieve tool, and the pipeline.",
-  createdAt: "2026-07-04T13:05:00Z",
-  updatedAt: "2026-07-04T13:05:00Z",
+  createdAt: "2026-07-09T13:05:00Z",
+  updatedAt: "2026-07-09T13:05:00Z",
   sections: [
     {
       category: "priming",

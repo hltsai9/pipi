@@ -4,8 +4,8 @@ registerStructuredQuiz({
   title: "How Compression Works",
   icon: "R",
   description: "ContentRouter and the type-aware compressors: SmartCrusher, CodeCompressor, Kompress, LogCompressor.",
-  createdAt: "2026-07-04T13:10:00Z",
-  updatedAt: "2026-07-04T13:10:00Z",
+  createdAt: "2026-07-09T13:10:00Z",
+  updatedAt: "2026-07-09T13:10:00Z",
   sections: [
     {
       category: "priming",
